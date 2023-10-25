@@ -5,6 +5,6 @@ import java.util.Date
 class Playlist (
     var id: String,
     var name: String,
-    var user: User,
+//    var user: User,
     var createAt: Date
 )
