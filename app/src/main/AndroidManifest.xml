@@ -13,6 +13,21 @@
         android:theme="@style/Theme.MusicApp"
         tools:targetApi="31">
         <activity
+            android:name=".FinalRegister"
+            android:exported="false"
+            android:label="@string/title_activity_final_register"
+            android:theme="@style/Theme.MusicApp" />
+        <activity
+            android:name=".activities.RegisterPassword"
+            android:exported="true" />
+        <activity
+            android:name=".activities.RegisterEmail"
+            android:exported="true" />
+        <activity
+            android:name=".activities.EnterLogin"
+            android:exported="true"
+            android:parentActivityName=".activities.Login" />
+        <activity
             android:name=".activities.Login"
             android:exported="true" />
         <activity
