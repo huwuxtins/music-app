@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp">
+
+        <ImageView
+            android:id="@+id/imgSong"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:background="@drawable/shape_circular"
+            android:scaleType="centerCrop"
+            android:src="@drawable/alan_walker"/>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="center">
+                <TextView
+                    android:id="@+id/tvNameSong"
+                    android:layout_width="150sp"
+                    android:layout_height="wrap_content"
+                    android:text="Tên bài hát"
+                    android:textSize="20sp"
+                    android:textColor="@color/text"
+                    android:textStyle="bold"
+                    android:ellipsize="end"/>
+                <TextView
+                    android:id="@+id/tvNameArtists"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:text="Tên nghệ sĩ"
+                    android:textSize="12sp"
+                    android:textColor="#CCCCCC"/>
+        </LinearLayout>
+        <ImageButton
+            android:id="@+id/imageButtonHeart"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/background"
+            android:src="@drawable/icon_heart"/>
+        <ImageButton
+            android:id="@+id/imageButtonPlay"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/background"
+            android:src="@drawable/icon_play"/>
+        <ImageButton
+            android:id="@+id/imageButtonNext"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/background"
+            android:src="@drawable/icon_next"/>
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/background"
+            android:src="@drawable/icon_menu" />
+
+</LinearLayout>

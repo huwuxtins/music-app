@@ -4,20 +4,18 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_margin="10dp">
-
     <ImageView
-        android:id="@+id/imgAvatarPlaylist"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:id="@+id/imgArtist"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_gravity="center"
-        android:background="@drawable/shape_round"
+        android:background="@drawable/shape_circular"
         android:scaleType="centerCrop" />
     <TextView
-        android:id="@+id/tvNamePlaylist"
+        android:id="@+id/tvNameArtist"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:text="Playlist's name"
+        android:text="Artist's name"
         android:textColor="@color/text"
-        android:textAlignment="center"
-        android:layout_gravity="center"/>
+        android:textAlignment="center"/>
 </LinearLayout>

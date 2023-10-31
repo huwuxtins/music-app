@@ -7,5 +7,13 @@ class Song (
     var name: String,
     var lyric: String,
     var link: String,
-    var postAt: Date
-)
+    var postAt: Date,
+    var artists: ArrayList<Artist>
+){
+    fun getArtists(): String {
+        if(artists.size > 2){
+            return artists[0].name + " " + artists[1].name + " and others"
+        }
+        return artists[0].name + " " + artists[1].name
+    }
+}

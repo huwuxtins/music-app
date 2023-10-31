@@ -16,15 +16,15 @@
             android:id="@+id/cslTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
             <ImageView
                 android:id="@+id/imgAvatar"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:background="@drawable/shape_circular"
+                android:scaleType="centerCrop"
                 android:src="@drawable/alan_walker"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"/>
             <TextView
                 android:id="@+id/tvLibrary"
                 android:layout_width="wrap_content"
@@ -79,7 +79,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:text="Danh sách yêu thích"
                 android:textColor="@color/text"
@@ -91,7 +91,7 @@
             <TextView
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginBottom="16dp"
                 android:text="Alan Walker, Sơn Tùng MTP and others"
                 android:textColor="@color/text"
@@ -105,62 +105,47 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:src="@drawable/icon_next"/>
+                android:src="@drawable/icon_redirect"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="20dp">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Your playlist"
-                android:textColor="@color/text"
-                android:textSize="30sp"
-                android:textStyle="bold"/>
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcvPlayList"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
+            android:layout_marginTop="16dp"
+            android:text="Your playlist"
+            android:textColor="@color/text"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvPlayList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="20dp">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Your farvourite artist"
-                android:textColor="@color/text"
-                android:textSize="30sp"
-                android:textStyle="bold"/>
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcvArtist"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
+            android:layout_marginTop="16dp"
+            android:text="Your favourite artist"
+            android:textColor="@color/text"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvArtist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-        <LinearLayout
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="20dp">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Listened song"
-                android:textColor="@color/text"
-                android:textSize="30sp"
-                android:textStyle="bold"/>
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcvHistory"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
+            android:layout_marginTop="16dp"
+            android:text="Listened song"
+            android:textColor="@color/text"
+            android:textSize="25sp"
+            android:textStyle="bold"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvHistory"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"/>
     </LinearLayout>
 
 </ScrollView>
