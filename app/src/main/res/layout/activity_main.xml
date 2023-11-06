@@ -16,7 +16,6 @@
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/btNav"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.75"
+        android:layout_height="wrap_content"
         app:menu="@menu/menu_bottom_navigation"/>
 </LinearLayout>
