@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/itPlay"
+        android:icon="@drawable/icon_play"
+        android:title="Trình phát nhạc">
+<!--        <menu>-->
+<!--            <item android:id="@+id/"-->
+<!--        </menu>-->
+    </item>
+    <item android:id="@+id/itContact"
+        android:icon="@drawable/icon_email"
+        android:title="Contact us"/>
+</menu>

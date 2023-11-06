@@ -16,47 +16,51 @@
             android:id="@+id/cslTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/imgAvatar"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:background="@drawable/shape_circular"
-                android:scaleType="centerCrop"
-                android:src="@drawable/alan_walker"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cavAvatar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="50dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintTop_toTopOf="parent">
+                <ImageView
+                    android:id="@+id/imgAvatar"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/shape_circular"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/alan_walker"/>
+            </androidx.cardview.widget.CardView>
+
             <TextView
                 android:id="@+id/tvLibrary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imgAvatar"
+                app:layout_constraintStart_toEndOf="@+id/cavAvatar"
                 android:text="Your library"
                 android:textSize="25sp"
                 android:textColor="@color/text"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:paddingLeft="10dp"/>
             <TextView
                 android:id="@+id/tvMyPage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@+id/tvLibrary"
-                app:layout_constraintStart_toEndOf="@+id/imgAvatar"
+                app:layout_constraintStart_toEndOf="@+id/cavAvatar"
                 android:text="Trang cá nhân"
                 android:textSize="15sp"
-                android:textColor="#CCCCCC"/>
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:src="@drawable/icon_menu"
-                android:backgroundTint="@color/background"/>
+                android:textColor="#CCCCCC"
+                android:paddingLeft="10dp"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cstFavSong"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="20dp"
+            android:clickable="true">
 
             <ImageView
                 android:id="@+id/imgFavList"
@@ -74,7 +78,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/imgFavList"
                 app:layout_constraintStart_toStartOf="@+id/imgFavList"
                 app:layout_constraintEnd_toEndOf="@+id/imgFavList"
-                android:src="@drawable/icon_heart"/>
+                android:src="@drawable/icon_heart_full"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -108,6 +112,63 @@
                 android:src="@drawable/icon_redirect"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cstDownSong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:clickable="true">
+
+            <ImageView
+                android:id="@+id/imgDownList"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:background="@drawable/shape_round"
+                android:backgroundTint="#FFF200"/>
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="@+id/imgDownList"
+                app:layout_constraintBottom_toBottomOf="@+id/imgDownList"
+                app:layout_constraintStart_toStartOf="@+id/imgDownList"
+                app:layout_constraintEnd_toEndOf="@+id/imgDownList"
+                android:src="@drawable/icon_download"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="Danh sách nhạc đã tải"
+                android:textColor="@color/text"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@+id/imgDownList"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="Alan Walker, Sơn Tùng MTP and others"
+                android:textColor="@color/text"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imgDownList" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:src="@drawable/icon_redirect"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -117,7 +178,7 @@
             android:textSize="25sp"
             android:textStyle="bold"/>
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rcvPlayList"
+            android:id="@+id/rcvPlaylist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 

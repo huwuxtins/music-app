@@ -6,5 +6,6 @@ class Playlist (
     var id: String,
     var name: String,
 //    var user: User,
-    var createAt: Date
+    var createAt: Date,
+    var songs: ArrayList<Song>
 )

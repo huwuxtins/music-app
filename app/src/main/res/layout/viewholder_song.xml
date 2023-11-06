@@ -16,8 +16,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
             android:layout_gravity="center">
                 <TextView
                     android:id="@+id/tvNameSong"
@@ -34,32 +34,26 @@
                     android:layout_height="wrap_content"
                     android:text="Tên nghệ sĩ"
                     android:textSize="12sp"
-                    android:textColor="#CCCCCC"/>
+                    android:textColor="@color/subtext"/>
         </LinearLayout>
         <ImageButton
-            android:id="@+id/imageButtonHeart"
+            android:id="@+id/btnHeart"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:backgroundTint="@color/background"
             android:src="@drawable/icon_heart"/>
         <ImageButton
-            android:id="@+id/imageButtonPlay"
+            android:id="@+id/btnPlay"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_gravity="center"
             android:backgroundTint="@color/background"
             android:src="@drawable/icon_play"/>
+
         <ImageButton
-            android:id="@+id/imageButtonNext"
+            android:id="@+id/btnMenu"
             android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_gravity="center"
-            android:backgroundTint="@color/background"
-            android:src="@drawable/icon_next"/>
-        <ImageButton
-            android:id="@+id/imageButton"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:backgroundTint="@color/background"
