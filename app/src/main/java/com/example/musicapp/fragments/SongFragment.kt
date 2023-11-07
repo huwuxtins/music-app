@@ -1,6 +1,7 @@
 package com.example.musicapp.fragments
 
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,11 +18,9 @@ import com.example.musicapp.R
 import com.example.musicapp.activities.MainActivity
 import com.example.musicapp.adapters.SongAdapter
 import com.example.musicapp.adapters.TrackViewPagerAdapter
-import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Song
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.Date
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import java.util.Timer
 import java.util.TimerTask
 
@@ -53,43 +52,49 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
         sbrMusic = view.findViewById(R.id.sbrMusic)
         tvStartTime = view.findViewById(R.id.tvStartTime)
         tvEndTime = view.findViewById(R.id.tvEndTime)
+
+        val storage = FirebaseStorage.getInstance()
+        val storageRef: StorageReference = storage.reference.child(song.link)
+
         btnPlay.setOnClickListener{
+            Log.e("MyApp", "Initialize: " + mainActivity.mediaPlayer.isPlaying.toString())
             if(mainActivity.mediaPlayer.isPlaying){
                 mainActivity.mediaPlayer.stop()
                 btnPlay.setImageDrawable(context?.resources?.getDrawable(R.drawable.icon_play, null))
             }
             else{
                 btnPlay.setImageDrawable(context?.resources?.getDrawable(R.drawable.icon_pause, null))
-                mainActivity.mediaPlayer = MediaPlayer.create(context, R.raw.on_my_way_alan_walker)
+                storageRef.downloadUrl.addOnSuccessListener {
+                    mainActivity.mediaPlayer = MediaPlayer.create(context, it)
+                    sbrMusic.max = mainActivity.mediaPlayer.duration
+                            tvEndTime.text = convertToMinute(mainActivity.mediaPlayer.duration)
+                    mainActivity.mediaPlayer.start()
 
-                sbrMusic.max = mainActivity.mediaPlayer.duration
-                tvEndTime.text = convertToMinute(mainActivity.mediaPlayer.duration)
-                mainActivity.mediaPlayer.start()
-
-                Timer().scheduleAtFixedRate(object: TimerTask() {
-                    override fun run() {
-                        sbrMusic.progress = mainActivity.mediaPlayer.currentPosition
-                    }
-                }, 0, 500)
-
-                sbrMusic.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
-                    override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                        if (seekBar != null) {
-                            tvStartTime.text = convertToMinute(seekBar.progress)
-                            tvEndTime.text = convertToMinute(mainActivity.mediaPlayer.duration - seekBar.progress)
+                    Timer().scheduleAtFixedRate(object: TimerTask() {
+                        override fun run() {
+                            sbrMusic.progress = mainActivity.mediaPlayer.currentPosition
                         }
-                        mainActivity.mediaPlayer.seekTo(progress)
-                    }
+                    }, 0, 500)
 
-                    override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                        Log.e("MyApp", "You're changing seekbar")
-                    }
+                    sbrMusic.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+                        override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                            if (seekBar != null) {
+                                tvStartTime.text = convertToMinute(seekBar.progress)
+                                tvEndTime.text = convertToMinute(mainActivity.mediaPlayer.duration - seekBar.progress)
+                            }
+                            mainActivity.mediaPlayer.seekTo(progress)
+                        }
 
-                    override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                        Log.e("MyApp", "You're stopping changing seekbar")
-                    }
+                        override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                            Log.e("MyApp", "You're changing seekbar")
+                        }
 
-                })
+                        override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                            Log.e("MyApp", "You're stopping changing seekbar")
+                        }
+
+                    })
+                }
             }
         }
 

@@ -9,6 +9,7 @@ class Song (
     var lyric: String,
     var link: String,
     var postAt: Date,
+    var image: String,
     var artists: ArrayList<Artist>,
 ){
     fun getArtists(): String {

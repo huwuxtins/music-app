@@ -1,21 +1,17 @@
 package com.example.musicapp.fragments
 
-import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.SeekBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.musicapp.R
-import com.example.musicapp.activities.MainActivity
 import com.example.musicapp.models.Song
-import java.util.Timer
-import java.util.TimerTask
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.squareup.picasso.Picasso
 
 class TrackFragment(private val song: Song): Fragment(R.layout.fragment_track) {
     private lateinit var imgSong: ImageView
@@ -33,7 +29,12 @@ class TrackFragment(private val song: Song): Fragment(R.layout.fragment_track) {
 
         tvNameSong.text = song.name
         tvNameArtists.text = song.getArtists()
-        imgSong.setImageDrawable(context?.resources?.getDrawable(R.drawable.alan_walker, null))
+
+        val storage = FirebaseStorage.getInstance()
+        val storageRef: StorageReference = storage.reference.child(song.image)
+        storageRef.downloadUrl.addOnSuccessListener {
+            Picasso.get().load(it).into(imgSong)
+        }
 
         return view
     }
