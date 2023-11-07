@@ -19,17 +19,15 @@ class Login : AppCompatActivity() {
 
 
         txt_login = findViewById(R.id.txt_login)
-        txt_login.setOnClickListener({
+        txt_login.setOnClickListener {
             val intent = Intent(this, EnterLogin::class.java)
             startActivity(intent)
-        })
+        }
 
-        btn_signup.setOnClickListener({
+        btn_signup.setOnClickListener {
             var intent = Intent(this, RegisterEmail::class.java)
             startActivity(intent)
-        })
-
-
+        }
 
 
     }
