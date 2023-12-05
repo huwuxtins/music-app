@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import com.example.musicapp.R
+import com.example.musicapp.dialog.LoadingDialog
 import com.example.musicapp.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
@@ -20,6 +21,7 @@ class RegisterAccount : AppCompatActivity() {
     var gender = arrayOf("Male","Female")
     var firebaseAuth = FirebaseAuth.getInstance();
     lateinit var database : DatabaseReference
+    lateinit var dialog : LoadingDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +35,7 @@ class RegisterAccount : AppCompatActivity() {
             R.layout.spinner_item, gender)
         chooseGender.adapter = adapter;
 
+        dialog = LoadingDialog(this)
 
         var edt_name : EditText = findViewById(R.id.edt_name);
         var btn_final : Button = findViewById(R.id.btn_final);
@@ -52,20 +55,18 @@ class RegisterAccount : AppCompatActivity() {
                 Toast.makeText(applicationContext,"Please enter your name",Toast.LENGTH_SHORT).show()
             }
             else{
+                dialog.ShowDialog("Register...")
                 firebaseAuth.createUserWithEmailAndPassword(email.toString(),password.toString())
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-
-
                             database = FirebaseDatabase.getInstance().getReference("Users")
 
                             var user = User(name.toString(),email.toString(),password.toString(),gender.toString(),true,"image.jpg");
 
-
-
                             database.child(email2.toString()).setValue(user) .addOnSuccessListener {
-                                Toast.makeText(applicationContext,"Successfully create account",Toast.LENGTH_SHORT).show()
+                                Toast.makeText(applicationContext,"Account successfully created",Toast.LENGTH_SHORT).show()
                                 editor.clear()
+                                dialog.HideDialog()
                                 var intent = Intent(this, EnterLogin::class.java)
                                 startActivity(intent)
                             }.addOnFailureListener{
@@ -73,7 +74,8 @@ class RegisterAccount : AppCompatActivity() {
                             }
 
                         } else {
-                            Toast.makeText(applicationContext,"Account already exists",Toast.LENGTH_SHORT).show()
+                            Toast.makeText(applicationContext,"Email already exists",Toast.LENGTH_SHORT).show()
+                            dialog.HideDialog()
                         }
                     }
             }

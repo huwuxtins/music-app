@@ -12,7 +12,7 @@
         android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="20dp"
         android:fontFamily="sans-serif"
         android:text="Email"
         android:textColor="@color/white"
@@ -20,23 +20,24 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/edt_email"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.095"
+        app:layout_constraintHorizontal_bias="0.083"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/edt_email"
-        android:layout_width="342dp"
-        android:layout_height="58dp"
-        android:layout_marginBottom="100dp"
+        android:layout_width="346dp"
+        android:layout_height="44dp"
+        android:layout_marginBottom="96dp"
         android:background="@drawable/edit_text"
         android:ems="10"
         android:inputType="text"
         android:text=""
+        android:paddingLeft="10dp"
         android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/btn_nextPass"
-        app:layout_constraintEnd_toEndOf="@+id/textView4"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/textView4" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.43"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/img_backStart"
