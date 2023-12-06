@@ -15,12 +15,14 @@ import com.example.musicapp.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterAccount : AppCompatActivity() {
 
     var gender = arrayOf("Male","Female")
     var firebaseAuth = FirebaseAuth.getInstance();
-    lateinit var database : DatabaseReference
+    //lateinit var database : DatabaseReference
+    lateinit var db : FirebaseFirestore
     lateinit var dialog : LoadingDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,20 +61,31 @@ class RegisterAccount : AppCompatActivity() {
                 firebaseAuth.createUserWithEmailAndPassword(email.toString(),password.toString())
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
-                            database = FirebaseDatabase.getInstance().getReference("Users")
-
+//                            database = FirebaseDatabase.getInstance().getReference("Users")
+                            db = FirebaseFirestore.getInstance()
                             var user = User(name.toString(),email.toString(),password.toString(),gender.toString(),true,"image.jpg");
-
-                            database.child(email2.toString()).setValue(user) .addOnSuccessListener {
-                                Toast.makeText(applicationContext,"Account successfully created",Toast.LENGTH_SHORT).show()
-                                editor.clear()
-                                dialog.HideDialog()
-                                var intent = Intent(this, EnterLogin::class.java)
-                                startActivity(intent)
-                            }.addOnFailureListener{
-                                Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
-                            }
-
+                            val newUser: HashMap<String, Any>  = user.toMap()
+                            db.collection("Users").document(user.email).set(newUser)
+                                .addOnSuccessListener { documentReference ->
+                                    Toast.makeText(applicationContext,"Account successfully created",Toast.LENGTH_SHORT).show()
+                                    editor.clear()
+                                    dialog.HideDialog()
+                                    var intent = Intent(this, EnterLogin::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                 }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
+                                }
+//                            database.child(email2.toString()).setValue(user) .addOnSuccessListener {
+//                                Toast.makeText(applicationContext,"Account successfully created",Toast.LENGTH_SHORT).show()
+//                                editor.clear()
+//                                dialog.HideDialog()
+//                                var intent = Intent(this, EnterLogin::class.java)
+//                                startActivity(intent)
+//                            }.addOnFailureListener{
+//                                Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
+//                            }
                         } else {
                             Toast.makeText(applicationContext,"Email already exists",Toast.LENGTH_SHORT).show()
                             dialog.HideDialog()

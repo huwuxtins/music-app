@@ -47,7 +47,7 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
-    
+
     <string name="fragment_info"> My Profile</string>
     <string name="fragment_edit">Account Settings</string>
     <string name="fragment_download">Downloaded</string>
