@@ -22,11 +22,9 @@ class RegisterPassword : AppCompatActivity() {
         val sharedPreference =  getSharedPreferences("AccountTmp", Context.MODE_PRIVATE)
         var editor = sharedPreference.edit()
 
-        img_backEmail.setOnClickListener(
-            {
-                onBackPressed()
-            },
-        )
+        img_backEmail.setOnClickListener {
+            onBackPressed()
+        }
 
         btn_nextname.setOnClickListener {
             var password = edt_password.text.toString();
