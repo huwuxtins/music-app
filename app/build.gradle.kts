@@ -54,6 +54,8 @@ dependencies {
     implementation ("pl.droidsonroids.gif:android-gif-drawable:1.2.17")
     implementation ("com.github.rosenpin:fading-text-view:3.0")
     implementation ("com.google.android.gms:play-services-auth:18.1.0")
+    implementation ("com.facebook.android:facebook-android-sdk:[8,9)")
+    implementation ("com.google.firebase:firebase-bom:32.6.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

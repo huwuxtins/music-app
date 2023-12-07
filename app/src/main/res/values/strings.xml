@@ -51,4 +51,10 @@
     <string name="fragment_info"> My Profile</string>
     <string name="fragment_edit">Account Settings</string>
     <string name="fragment_download">Downloaded</string>
+
+    <string name="facebook_app_id">650138527191943</string>
+    <string name="fb_login_protocol_scheme">fb650138527191943</string>
+    <string name="facebook_client_token">f2f79d40a358edfa10834b92db649d24</string>
+
+
 </resources>

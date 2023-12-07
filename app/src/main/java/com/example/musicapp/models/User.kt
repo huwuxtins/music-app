@@ -6,7 +6,8 @@ class User (
     var password: String,
     var gender: String,
     var status: Boolean,
-    var avatar: String
+    var avatar: String,
+    var uid: String
 ){
     fun toMap() : HashMap<String, Any>{
         val user : HashMap<String,Any> = HashMap<String, Any>()
@@ -16,6 +17,7 @@ class User (
         user.put("gender",gender)
         user.put("status",status)
         user.put("avatar",avatar)
+        user.put("uid",uid)
         return user;
     }
 
