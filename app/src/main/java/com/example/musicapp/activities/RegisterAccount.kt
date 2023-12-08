@@ -77,15 +77,6 @@ class RegisterAccount : AppCompatActivity() {
                                 .addOnFailureListener { e ->
                                     Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
                                 }
-//                            database.child(email2.toString()).setValue(user) .addOnSuccessListener {
-//                                Toast.makeText(applicationContext,"Account successfully created",Toast.LENGTH_SHORT).show()
-//                                editor.clear()
-//                                dialog.HideDialog()
-//                                var intent = Intent(this, EnterLogin::class.java)
-//                                startActivity(intent)
-//                            }.addOnFailureListener{
-//                                Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
-//                            }
                         } else {
                             Toast.makeText(applicationContext,"Email already exists",Toast.LENGTH_SHORT).show()
                             dialog.HideDialog()

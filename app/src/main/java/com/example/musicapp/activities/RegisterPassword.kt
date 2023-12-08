@@ -9,8 +9,16 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import com.example.musicapp.R
+import com.example.musicapp.dialog.LoadingDialog
+import com.example.musicapp.models.User
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterPassword : AppCompatActivity() {
+
+    lateinit var dialog : LoadingDialog
+    var firebaseAuth = FirebaseAuth.getInstance();
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register_password)
@@ -21,6 +29,8 @@ class RegisterPassword : AppCompatActivity() {
 
         val sharedPreference =  getSharedPreferences("AccountTmp", Context.MODE_PRIVATE)
         var editor = sharedPreference.edit()
+
+        dialog = LoadingDialog(this)
 
         img_backEmail.setOnClickListener {
             onBackPressed()
@@ -36,13 +46,27 @@ class RegisterPassword : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                editor.putString("password", password);
-                editor.commit();
-                var intent = Intent(this, RegisterAccount::class.java)
-                startActivity(intent)
+                val sharedPreference =  getSharedPreferences("AccountTmp", Context.MODE_PRIVATE)
+                var editor = sharedPreference.edit()
+                var email = sharedPreference.getString("email","null");
+                dialog.ShowDialog("Register...")
+                firebaseAuth.createUserWithEmailAndPassword(email.toString(),password)
+                    .addOnCompleteListener(this) { task ->
+                        if (task.isSuccessful) {
+                            Toast.makeText(applicationContext,"Account successfully created",Toast.LENGTH_SHORT).show()
+                            editor.clear()
+                            dialog.HideDialog()
+                            var intent = Intent(this, EnterLogin::class.java)
+                            startActivity(intent)
+                            finish()
+
+                        } else {
+                            Toast.makeText(applicationContext,"Email already exists",Toast.LENGTH_SHORT).show()
+                            dialog.HideDialog()
+                        }
+                    }
+
             }
         }
-
-
     }
 }
