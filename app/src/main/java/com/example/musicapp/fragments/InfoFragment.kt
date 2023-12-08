@@ -40,7 +40,7 @@ class InfoFragment: Fragment(R.layout.fragment_info) {
 
     fun updateInfo(){
         val user = auth.currentUser
-        val email = user?.email
+        val email = user?.providerData?.get(1)?.email
         val name = user?.displayName
 
         tvName.setText(name.toString())

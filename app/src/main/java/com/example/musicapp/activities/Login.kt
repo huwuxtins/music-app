@@ -112,23 +112,23 @@ class Login : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-//                    val email = user?.providerData?.get(1)?.email
-//                    val name = user?.displayName
-//                    val image =  user?.providerData?.get(1)?.photoUrl
-//                    val uid = user?.providerData?.get(1)?.uid
-//                    val nUser = User(name.toString(),email.toString(),"null","Male",true,image.toString(),uid.toString())
+                    val email = user?.providerData?.get(1)?.email
+                    val name = user?.displayName
+                    val image =  user?.providerData?.get(1)?.photoUrl
+                    val uid = user?.providerData?.get(1)?.uid
+                    val nUser = User(name.toString(),email.toString(),"null","Male",true,image.toString(),uid.toString())
 
-//                    db.collection("Users").document(nUser.uid).set(nUser)
-//                        .addOnSuccessListener { documentReference ->
+                    db.collection("Users").document(nUser.email).set(nUser)
+                        .addOnSuccessListener { documentReference ->
                             Toast.makeText(this, "Signed in as ${user?.displayName}", Toast.LENGTH_SHORT).show()
                             dialog.HideDialog()
                             startActivity(Intent(this, MainActivity::class.java))
                             finish()
-//                        }
-//                        .addOnFailureListener { e ->
-//                            Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
-//                            dialog.HideDialog()
-//                        }
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
+                            dialog.HideDialog()
+                        }
 
                 } else {
                     Toast.makeText(this, "Authentication Google failed", Toast.LENGTH_SHORT).show()
@@ -176,13 +176,13 @@ class Login : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-//                    val id = user?.providerData?.get(1)?.uid
-//                    val name = user?.displayName
-//                    val image =  user?.providerData?.get(1)?.photoUrl
-//                    val email = user?.providerData?.get(1)?.email
-//                    val nUser = User(name.toString(),""+email.toString(),"null","Male",true,image.toString(),id.toString())
-//                    db.collection("Users").document(nUser.uid).set(nUser)
-//                        .addOnSuccessListener { documentReference ->
+                    val id = user?.providerData?.get(1)?.uid
+                    val name = user?.displayName
+                    val image =  user?.providerData?.get(1)?.photoUrl
+                    val email = user?.providerData?.get(1)?.email
+                    val nUser = User(name.toString(),""+email.toString(),"null","Male",true,image.toString(),id.toString())
+                    db.collection("Users").document(nUser.email).set(nUser)
+                        .addOnSuccessListener { documentReference ->
                             Toast.makeText(
                                 baseContext,
                                 "Log in success with " + user?.displayName,
@@ -195,16 +195,16 @@ class Login : AppCompatActivity() {
                             startActivity(intent)
 
                             finish()
-//                        }
-//                        .addOnFailureListener { e ->
-//                            Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
-//                            dialog.HideDialog()
-//                        }
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
+                            dialog.HideDialog()
+                        }
 
                 } else {
                     Toast.makeText(
                         baseContext,
-                        "Authentication Facebook failed.",
+                        "Email of Facebook account already exists.",
                         Toast.LENGTH_SHORT,
                     ).show()
                     dialog.HideDialog()
