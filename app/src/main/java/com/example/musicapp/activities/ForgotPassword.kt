@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.musicapp.R
 import com.example.musicapp.dialog.LoadingDialog
+import com.example.musicapp.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -72,20 +73,28 @@ class ForgotPassword : AppCompatActivity() {
                             val document = task.result
                             if(document != null) {
                                 if (document.exists()) {
-                                    auth.sendPasswordResetEmail(email)
-                                        .addOnCompleteListener { task ->
-                                            if (task.isSuccessful) {
-                                                Toast.makeText(applicationContext,"Password reset email successfully sent",Toast.LENGTH_SHORT).show();
-                                                dialog.HideDialog()
-                                                var intent = Intent(this, EnterLogin::class.java)
-                                                startActivity(intent)
-                                                finish()
+                                    val user = document.toObject(User::class.java)
+                                    if(user?.type.toString()=="Normal"){
+                                        auth.sendPasswordResetEmail(email)
+                                            .addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    Toast.makeText(applicationContext,"Password reset email successfully sent",Toast.LENGTH_SHORT).show();
+                                                    dialog.HideDialog()
+                                                    var intent = Intent(this, EnterLogin::class.java)
+                                                    startActivity(intent)
+                                                    finish()
+                                                }
+                                                else{
+                                                    Toast.makeText(applicationContext,"Sending password reset email failed",Toast.LENGTH_SHORT).show();
+                                                    dialog.HideDialog()
+                                                }
                                             }
-                                            else{
-                                                Toast.makeText(applicationContext,"Sending password reset email failed",Toast.LENGTH_SHORT).show();
-                                                dialog.HideDialog()
-                                            }
-                                        }
+                                    }
+                                    else{
+                                        Toast.makeText(applicationContext,"This account cannot perform forgotten password",Toast.LENGTH_SHORT).show();
+                                        dialog.HideDialog()
+                                    }
+
                                 } else {
                                     Toast.makeText(applicationContext,"Email does not exist",Toast.LENGTH_SHORT).show();
                                     dialog.HideDialog()

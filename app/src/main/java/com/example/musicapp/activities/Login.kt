@@ -26,6 +26,7 @@ import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 
 
@@ -93,7 +94,28 @@ class Login : AppCompatActivity() {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                firebaseAuthWithGoogle(account.idToken!!)
+                val email = account.email  //check email ton tai hay khong
+                val docref =db.collection("Users").document(email.toString())
+                docref.get().addOnCompleteListener {  task ->
+                    if (task.isSuccessful){
+                        val document = task.result
+                        if(document != null) {
+                            if (document.exists()) {
+                                val user = document.toObject(User::class.java)
+                                if(user?.type == "Google"){
+                                    firebaseAuthWithGoogle(account.idToken!!)
+                                }
+                                else{
+                                    Toast.makeText(this, "Email already exists", Toast.LENGTH_SHORT).show()
+                                }
+
+                            } else {
+                                firebaseAuthWithGoogle(account.idToken!!)
+                            }
+                        }
+                    }
+                }
+              //  firebaseAuthWithGoogle(account.idToken!!)
             } catch (e: ApiException) {
                // Toast.makeText(this, "Google sign in failed: ${e.message}", Toast.LENGTH_SHORT).show()
             }
@@ -110,34 +132,47 @@ class Login : AppCompatActivity() {
         dialog.ShowDialog("Google")
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
+                if (task.isSuccessful) {  //kiem tra da co tk trong database chua | neu co roi => ko tao | chua co => tao
                     val user = auth.currentUser
-                    val email = user?.providerData?.get(1)?.email
-                    val name = user?.displayName
-                    val image =  user?.providerData?.get(1)?.photoUrl
-                    val uid = user?.providerData?.get(1)?.uid
-                    val nUser = User(name.toString(),email.toString(),"null","Male",true,image.toString(),uid.toString())
-
-                    db.collection("Users").document(nUser.email).set(nUser)
-                        .addOnSuccessListener { documentReference ->
-                            Toast.makeText(this, "Signed in as ${user?.displayName}", Toast.LENGTH_SHORT).show()
+                    val docRef: DocumentReference = db.collection("Users").document(user?.email.toString())
+                    docRef.get().addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val document = task.result
+                            if (document.exists()) { //co roi
+                                Toast.makeText(this, "Signed in as ${user?.displayName}", Toast.LENGTH_SHORT).show()
+                                dialog.HideDialog()
+                                startActivity(Intent(this, MainActivity::class.java))
+                                finish()
+                            } else {  //chua co
+                                val email = user?.providerData?.get(1)?.email
+                                val name = user?.displayName
+                                val image =  user?.providerData?.get(1)?.photoUrl
+                                val uid = user?.providerData?.get(1)?.uid
+                                val nUser = User(name.toString(),email.toString(),"null","Male",true,image.toString(),uid.toString(),"Google")
+                                db.collection("Users").document(nUser.email).set(nUser)
+                                    .addOnSuccessListener { documentReference ->
+                                        Toast.makeText(this, "Signed in as ${user?.displayName}", Toast.LENGTH_SHORT).show()
+                                        dialog.HideDialog()
+                                        startActivity(Intent(this, MainActivity::class.java))
+                                        finish()
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
+                                        dialog.HideDialog()
+                                    }
+                            }
+                        } else {
+                            Toast.makeText(applicationContext, "Error system", Toast.LENGTH_SHORT)
+                                .show();
                             dialog.HideDialog()
-                            startActivity(Intent(this, MainActivity::class.java))
-                            finish()
                         }
-                        .addOnFailureListener { e ->
-                            Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
-                            dialog.HideDialog()
-                        }
-
+                    }
                 } else {
                     Toast.makeText(this, "Authentication Google failed", Toast.LENGTH_SHORT).show()
                     dialog.HideDialog()
-
                 }
             }
     }
-
 
     fun  signInWithFacebook(){
         LoginManager.getInstance().logInWithReadPermissions(this@Login,listOf("email","public_profile"))
@@ -176,30 +211,58 @@ class Login : AppCompatActivity() {
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
-                    val id = user?.providerData?.get(1)?.uid
-                    val name = user?.displayName
-                    val image =  user?.providerData?.get(1)?.photoUrl
-                    val email = user?.providerData?.get(1)?.email
-                    val nUser = User(name.toString(),""+email.toString(),"null","Male",true,image.toString(),id.toString())
-                    db.collection("Users").document(nUser.email).set(nUser)
-                        .addOnSuccessListener { documentReference ->
-                            Toast.makeText(
-                                baseContext,
-                                "Log in success with " + user?.displayName,
-                                Toast.LENGTH_SHORT,
-                            ).show()
+                    val docRef: DocumentReference = db.collection("Users").document(user?.email.toString())
+                    docRef.get().addOnCompleteListener {task ->
+                        if (task.isSuccessful){
+                            val document = task.result
+                            if (document.exists()){  //co roi
+                                Toast.makeText(
+                                    baseContext,
+                                    "Log in success with " + user?.displayName,
+                                    Toast.LENGTH_SHORT,
+                                ).show()
 
-                             dialog.HideDialog()
+                                dialog.HideDialog()
 
-                            var intent = Intent(this, MainActivity::class.java)
-                            startActivity(intent)
+                                var intent = Intent(this, MainActivity::class.java)
+                                startActivity(intent)
 
-                            finish()
+                                finish()
+                            }
+                            else{ //chua co
+                                val id = user?.providerData?.get(1)?.uid
+                                val name = user?.displayName
+                                val image =  user?.providerData?.get(1)?.photoUrl
+                                val email = user?.providerData?.get(1)?.email
+                                val nUser = User(name.toString(),""+email.toString(),"null","Male",true,image.toString(),id.toString(),"Facebook")
+                                db.collection("Users").document(nUser.email).set(nUser)
+                                    .addOnSuccessListener { documentReference ->
+                                        Toast.makeText(
+                                            baseContext,
+                                            "Log in success with " + user?.displayName,
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+
+                                        dialog.HideDialog()
+
+                                        var intent = Intent(this, MainActivity::class.java)
+                                        startActivity(intent)
+
+                                        finish()
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
+                                        dialog.HideDialog()
+                                    }
+                            }
                         }
-                        .addOnFailureListener { e ->
-                            Toast.makeText(applicationContext,"Failed!!",Toast.LENGTH_SHORT).show()
+                        else{
+                            Toast.makeText(applicationContext, "Error system", Toast.LENGTH_SHORT)
+                                .show();
                             dialog.HideDialog()
                         }
+
+                    }
 
                 } else {
                     Toast.makeText(
