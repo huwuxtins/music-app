@@ -167,6 +167,7 @@ class Login : AppCompatActivity() {
     }
 
 
+    @SuppressLint("SuspiciousIndentation")
     private fun handleFacebookAccessToken(token: AccessToken) {
         Log.d(TAG, "handleFacebookAccessToken:$token")
         dialog.ShowDialog("Facebook")
