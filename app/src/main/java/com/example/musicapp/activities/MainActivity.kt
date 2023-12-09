@@ -55,6 +55,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+
     }
 
     fun loadFragment(fragment: Fragment, stackName: String){

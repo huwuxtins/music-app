@@ -26,14 +26,14 @@ class TrackFragment(private val song: Song): Fragment(R.layout.fragment_track) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_track, container, false)
-        imgSong = view.findViewById(R.id.imgSong)
-        tvNameSong = view.findViewById(R.id.tvNameSong)
-        tvNameArtists = view.findViewById(R.id.tvNameArtists)
-
-        tvNameSong.text = song.name
-        tvNameArtists.text = song.getArtists()
-        imgSong.setImageDrawable(context?.resources?.getDrawable(R.drawable.alan_walker, null))
+//        val view = inflater.inflate(R.layout.fragment_track, container, false)
+//        imgSong = view.findViewById(R.id.imgSong)
+//        tvNameSong = view.findViewById(R.id.tvNameSong)
+//        tvNameArtists = view.findViewById(R.id.tvNameArtists)
+//
+//        tvNameSong.text = song.name
+//        tvNameArtists.text = song.getArtists()
+//        imgSong.setImageDrawable(context?.resources?.getDrawable(R.drawable.alan_walker, null))
 
         return view
     }

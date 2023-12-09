@@ -44,60 +44,60 @@ class LibraryFragment() : Fragment(R.layout.fragment_library) {
         val mainActivity = context as MainActivity
 
         val artists = ArrayList<Artist>()
-        artists.add(Artist("1", "Alan Walker", Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), "British",
+        artists.add(Artist(1, "Alan Walker","28/10/2990", "British",
             "Alan Olav Walker, thường được biết đến với nghệ danh Alan Walker là một nam DJ và nhà sản xuất thu âm người Anh gốc Na Uy Vào năm 2015, Alan bắt đầu trở nên nổi tiếng trên phạm vi quốc tế sau khi phát hành đĩa đơn \"Faded\" và nhận được chứng nhận bạch kim tại 14 quốc gia.",
             "alan_walker", 45000000
         ))
-        artists.add(Artist("2", "JustaTee", Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), "Vietnamese",
+        artists.add(Artist(2, "JustaTee","28/10/2990", "Vietnamese",
             "Alan Olav Walker, thường được biết đến với nghệ danh Alan Walker là một nam DJ và nhà sản xuất thu âm người Anh gốc Na Uy Vào năm 2015, Alan bắt đầu trở nên nổi tiếng trên phạm vi quốc tế sau khi phát hành đĩa đơn \"Faded\" và nhận được chứng nhận bạch kim tại 14 quốc gia.",
             "justa_tee", 450000
         ))
-        artists.add(Artist("3", "Den vau", Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), "Vietnamese",
+        artists.add(Artist(3, "Den vau", "28/10/2990", "Vietnamese",
             "Alan Olav Walker, thường được biết đến với nghệ danh Alan Walker là một nam DJ và nhà sản xuất thu âm người Anh gốc Na Uy Vào năm 2015, Alan bắt đầu trở nên nổi tiếng trên phạm vi quốc tế sau khi phát hành đĩa đơn \"Faded\" và nhận được chứng nhận bạch kim tại 14 quốc gia.",
             "den_vau", 5000000))
 
-        val songs1 = ArrayList<Song>()
-        songs1.add(Song("1", "Faded", "Faded", "faded.link",
-            Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), artists))
-        songs1.add(Song("2",
-            "Thang dien", "Faded", "thang_dien.link",
-            Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), artists))
+//        val songs1 = ArrayList<Song>()
+//        songs1.add(Song("1", "Faded", "Faded", "faded.link",
+//            Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), artists))
+//        songs1.add(Song("2",
+//            "Thang dien", "Faded", "thang_dien.link",
+//            Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), artists))
+//
+//        val songs2 = ArrayList<Song>()
+//        songs2.add(Song("3", "La lung", "Faded", "la_lung.link",
+//            Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), artists))
+//        songs2.add(Song("4", "Talk to you", "Faded", "talk_to_you.link",
+//            Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), artists))
+//
+//        val playlists = ArrayList<Playlist>()
+//        playlists.add(Playlist("1","Playlist 1",
+//                Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), songs1))
+//        playlists.add(Playlist("2","Playlist 2",
+//                Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), songs2))
 
-        val songs2 = ArrayList<Song>()
-        songs2.add(Song("3", "La lung", "Faded", "la_lung.link",
-            Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), artists))
-        songs2.add(Song("4", "Talk to you", "Faded", "talk_to_you.link",
-            Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), artists))
-
-        val playlists = ArrayList<Playlist>()
-        playlists.add(Playlist("1","Playlist 1",
-                Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), songs1))
-        playlists.add(Playlist("2","Playlist 2",
-                Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()), songs2))
-
-        cstFavSong.setOnClickListener{
-            mainActivity.loadFragment(PlaylistFragment(playlists[0]), "body")
-        }
-        cstDownSong.setOnClickListener{
-            mainActivity.loadFragment(DownloadFragment(), "body")
-        }
-
-        val playlistAdapter = PlaylistAdapter(view.context, playlists)
-        rcvPlaylist.adapter = playlistAdapter
-        rcvPlaylist.layoutManager =
-            LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
-
-        val artistAdapter = ArtistAdapter(view.context, artists)
-        rcvArtist.adapter = artistAdapter
-        rcvArtist.layoutManager =
-            LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
-
-        val songAdapter = SongAdapter(view.context, songs1)
-        rcvSong.adapter = songAdapter
-        rcvSong.hasFixedSize()
-        rcvSong.layoutManager =
-            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
-        return view
+//        cstFavSong.setOnClickListener{
+//            mainActivity.loadFragment(PlaylistFragment(playlists[0]), "body")
+//        }
+//        cstDownSong.setOnClickListener{
+//            mainActivity.loadFragment(DownloadFragment(), "body")
+//        }
+//
+//        val playlistAdapter = PlaylistAdapter(view.context, playlists)
+//        rcvPlaylist.adapter = playlistAdapter
+//        rcvPlaylist.layoutManager =
+//            LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
+//
+//        val artistAdapter = ArtistAdapter(view.context, artists)
+//        rcvArtist.adapter = artistAdapter
+//        rcvArtist.layoutManager =
+//            LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
+//
+//        val songAdapter = SongAdapter(view.context, songs1)
+//        rcvSong.adapter = songAdapter
+//        rcvSong.hasFixedSize()
+//        rcvSong.layoutManager =
+//            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+         return view
     }
 
 

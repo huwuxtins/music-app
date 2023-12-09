@@ -56,6 +56,9 @@ dependencies {
     implementation ("com.google.android.gms:play-services-auth:18.1.0")
     implementation ("com.facebook.android:facebook-android-sdk:[8,9)")
     implementation ("com.google.firebase:firebase-bom:32.6.0")
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
+    implementation("com.squareup.picasso:picasso:2.71828")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
