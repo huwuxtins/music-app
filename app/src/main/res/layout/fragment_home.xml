@@ -74,7 +74,7 @@
                 android:layout_marginTop="52dp"
                 android:drawableRight="@drawable/play2"
                 android:drawablePadding="10dp"
-                android:text="Singers "
+                android:text="Artists "
                 android:textColor="@color/white"
                 android:textSize="30dp"
                 android:textStyle="bold"

@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
@@ -32,6 +34,8 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
     private lateinit var recyclerviewNewSong : RecyclerView
     private lateinit var listNewSong : ArrayList<Song>
     private lateinit var newsongAdapter: NewSongAdapter
+
+    private lateinit var txt_singer : TextView
 
     lateinit var db: FirebaseFirestore
 
@@ -64,6 +68,15 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
             recyclerviewNewSong!!.layoutManager = LinearLayoutManager(requireActivity().applicationContext, LinearLayoutManager.VERTICAL, false)
             listNewSong = getListNewSong()
 
+            txt_singer = view.findViewById(R.id.txt_singer)
+
+            txt_singer.setOnClickListener(object : View.OnClickListener {
+                override fun onClick(view: View?) {
+                        goToArtistFragment();
+                }
+
+            })
+
             return view
     }
 
@@ -79,11 +92,9 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
         return l
     }
 
-
-
     private fun getListSinger() : ArrayList<Artist>{  //lay list artist tu database => set vao adapter
         val l : ArrayList<Artist> = ArrayList<Artist>()
-        db.collection("Artists")
+        db.collection("Artists").limit(6)
             .get()
             .addOnSuccessListener { result ->
                 for (document in result) {
@@ -119,7 +130,12 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
         return l
     }
 
-
+    private fun goToArtistFragment(){
+        val transaction = activity?.supportFragmentManager?.beginTransaction()
+        transaction?.replace(R.id.frgMain, ArtistsFragment())
+        transaction?.disallowAddToBackStack()
+        transaction?.commit()
+    }
 
 
 }

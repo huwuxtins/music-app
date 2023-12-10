@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.example.musicapp.models.Artist
@@ -29,12 +30,15 @@ class SingerAdapter(private val context: Context, private var list: ArrayList<Ar
     }
 
     override fun onBindViewHolder(holder: SingerViewHolder, position: Int) {  // hien thi anh va ten cac nghe si
-        if(position <= 7){
             val art = list[position]
             holder.name.text = art.name
             val link = art.avatar
             Picasso.get().load(link).into(holder.profile);
-        }
+
+
+            holder.itemView.setOnClickListener {
+                Toast.makeText(context,art.name,Toast.LENGTH_SHORT).show()
+            }
     }
 
 
@@ -48,6 +52,8 @@ class SingerAdapter(private val context: Context, private var list: ArrayList<Ar
         init {
             profile = itemView.findViewById(R.id.profile_image)
             name = itemView.findViewById(R.id.artist_name)
+
+
         }
     }
 

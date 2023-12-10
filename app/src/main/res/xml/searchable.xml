@@ -1,0 +1,6 @@
+<searchable xmlns:android="http://schemas.android.com/apk/res/android"
+    android:label="Music App"
+    android:hint="Search"
+    android:searchSuggestAuthority="com.example.MySuggestionProvider"
+    android:searchSuggestSelection=" ?" >
+</searchable>
