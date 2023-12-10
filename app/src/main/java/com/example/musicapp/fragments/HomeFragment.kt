@@ -133,7 +133,7 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
     private fun goToArtistFragment(){
         val transaction = activity?.supportFragmentManager?.beginTransaction()
         transaction?.replace(R.id.frgMain, ArtistsFragment())
-        transaction?.disallowAddToBackStack()
+        transaction?.addToBackStack("null")
         transaction?.commit()
     }
 

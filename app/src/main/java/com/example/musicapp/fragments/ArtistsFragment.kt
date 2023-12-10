@@ -1,17 +1,17 @@
 package com.example.musicapp.fragments
 
+
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
-import com.example.musicapp.adapters.ArtistAdapter
 import com.example.musicapp.adapters.SingerAdapter
 import com.example.musicapp.models.Artist
 import com.google.android.flexbox.FlexDirection
@@ -26,16 +26,19 @@ class ArtistsFragment : Fragment() {
     lateinit var list : ArrayList<Artist>
     lateinit var artistAdapter: SingerAdapter
     lateinit var db : FirebaseFirestore
-
+    lateinit var back : ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
+
     ): View? {
         val view = inflater.inflate(R.layout.fragment_artists, container, false)
         searchView = view.findViewById(R.id.edt_search22)
 
         recyclerView = view.findViewById(R.id.listArtists)
+
+        back = view.findViewById(R.id.img_back)
 
         db = FirebaseFirestore.getInstance()
 
@@ -63,6 +66,11 @@ class ArtistsFragment : Fragment() {
                 return false
             }
         })
+
+        back.setOnClickListener{
+            onBackPressed()
+        }
+
         return view
     }
 
@@ -84,4 +92,12 @@ class ArtistsFragment : Fragment() {
             }
         return l
     }
+
+    fun onBackPressed() {
+        if (parentFragmentManager.backStackEntryCount > 0) {
+            parentFragmentManager.popBackStack()
+        }
+    }
+
+
 }
