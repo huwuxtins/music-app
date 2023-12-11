@@ -8,4 +8,5 @@
     <color name="backgroundButton">#0013BB</color>
     <color name="subtext">#CCCCCC</color>
     <color name="red">#FF0000</color>
+    <color name="selected">#1ED760</color>
 </resources>
