@@ -25,36 +25,36 @@ class SongAdapter(private val context: Context, private val songs: ArrayList<Son
     }
 
     override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
-        holder.tvNameSong.text = songs[position].name
-        holder.tvNameArtists.text = songs[position].getArtists()
-        holder.imgSong.setImageDrawable(context.resources.getDrawable(R.drawable.alan_walker, null))
-        holder.openTrack(context, songs)
-
-        holder.btnMenu.setOnClickListener{ view ->
-            val popupMenu = PopupMenu(context, view)
-            popupMenu.inflate(R.menu.menu_song) // Inflate your menu resource
-            popupMenu.show()
-
-            // Set click listeners for menu items (if needed)
-            popupMenu.setOnMenuItemClickListener {
-                // Handle menu item click here
-                when (it.itemId) {
-                    R.id.itDownload -> {
-                        Log.e("MyApp", "Downloading")
-                        true
-                    }
-                    R.id.itAddHeart -> {
-                        Log.e("MyApp", "Adding to favourite list")
-                        true
-                    }
-                    R.id.itAddPlaylist -> {
-                        Log.e("MyApp", "Adding to playlist")
-                        true
-                    }
-                    else -> false
-                }
-            }
-        }
+//        holder.tvNameSong.text = songs[position].name
+//        holder.tvNameArtists.text = songs[position].artist.name
+//        holder.imgSong.setImageDrawable(context.resources.getDrawable(R.drawable.alan_walker, null))
+//        holder.openTrack(context, songs)
+//
+//        holder.btnMenu.setOnClickListener{ view ->
+//            val popupMenu = PopupMenu(context, view)
+//            popupMenu.inflate(R.menu.menu_song) // Inflate your menu resource
+//            popupMenu.show()
+//
+//            // Set click listeners for menu items (if needed)
+//            popupMenu.setOnMenuItemClickListener {
+//                // Handle menu item click here
+//                when (it.itemId) {
+//                    R.id.itDownload -> {
+//                        Log.e("MyApp", "Downloading")
+//                        true
+//                    }
+//                    R.id.itAddHeart -> {
+//                        Log.e("MyApp", "Adding to favourite list")
+//                        true
+//                    }
+//                    R.id.itAddPlaylist -> {
+//                        Log.e("MyApp", "Adding to playlist")
+//                        true
+//                    }
+//                    else -> false
+//                }
+//            }
+//        }
     }
 
     override fun getItemCount() = songs.size

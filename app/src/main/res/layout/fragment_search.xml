@@ -1,11 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="#424242"
     android:layout_height="match_parent">
 
-    <TextView
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/edt_search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Search page"/>
+        android:layout_marginTop="32dp"
+        android:background="@drawable/search_view"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search"
+        app:iconifiedByDefault="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:queryHint="Search" />
 
-</LinearLayout>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/searchSong"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:backgroundTint="@color/black"
+        android:text="Song"
+        app:cornerRadius="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edt_search" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/searchArtist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:backgroundTint="@color/black"
+        android:text="Artist"
+        app:cornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/searchSong"
+        app:layout_constraintStart_toEndOf="@+id/searchSong"
+        app:layout_constraintTop_toTopOf="@+id/searchSong"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/searchAlbum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="30dp"
+        android:backgroundTint="@color/black"
+        android:text="Album"
+        app:cornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/searchArtist"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/searchArtist"
+        app:layout_constraintTop_toTopOf="@+id/searchArtist"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:paddingLeft="8dp"
+        android:id="@+id/listResult"
+        android:layout_width="380dp"
+        android:layout_height="515dp"
+        android:layout_marginTop="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchArtist" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

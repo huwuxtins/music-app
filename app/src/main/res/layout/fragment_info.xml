@@ -46,22 +46,11 @@
         app:layout_constraintTop_toBottomOf="@+id/cvAvatar"
         android:text="Nguyen Huu Tin"
         android:textColor="@color/text"
+        android:drawablePadding="10dp"
         android:textSize="20sp"
         android:drawableStart="@drawable/icon_user"/>
 
-    <TextView
-        android:id="@+id/tvUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvName"
-        android:text="nguyenhuutin3423"
-        android:textColor="@color/text"
-        android:textSize="16sp"
-        android:drawableStart="@drawable/icon_profile"/>
+
 
     <TextView
         android:id="@+id/tvEmail"
@@ -71,7 +60,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvUsername"
+        app:layout_constraintTop_toBottomOf="@+id/tvName"
+        android:drawablePadding="10dp"
         android:text="nguyenhuutin3423@gmail.com"
         android:textColor="@color/text"
         android:textSize="16sp"

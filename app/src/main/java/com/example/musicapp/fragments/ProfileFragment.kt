@@ -1,5 +1,6 @@
 package com.example.musicapp.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,14 +12,18 @@ import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.musicapp.R
+import com.example.musicapp.activities.Login
 import com.example.musicapp.activities.MainActivity
+import com.example.musicapp.dialog.LoadingDialog
+import com.google.firebase.auth.FirebaseAuth
 
 class ProfileFragment: Fragment(R.layout.fragment_profile) {
     private lateinit var tvInfo: TextView
     private lateinit var tvEdit: TextView
     private lateinit var tvLogout: TextView
     private lateinit var btnSetting: ImageButton
-
+    private lateinit var auth : FirebaseAuth
+    private lateinit var dialog : LoadingDialog
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -29,7 +34,7 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
         tvEdit = view.findViewById(R.id.tvEdit)
         tvLogout = view.findViewById(R.id.tvLogout)
         btnSetting = view.findViewById(R.id.btnSetting)
-
+        auth = FirebaseAuth.getInstance()
         val mainActivity = context as MainActivity
         tvInfo.setOnClickListener{
             mainActivity.loadFragment(InfoFragment(), "body")
@@ -61,6 +66,14 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
                 }
             }
         }
+
+        tvLogout.setOnClickListener {
+            auth.signOut()
+            val intent = Intent(activity, Login::class.java)
+            startActivity(intent)
+            activity?.finish()
+        }
+
         return view
     }
 }

@@ -34,9 +34,9 @@
         android:text=""
         android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/textView7"
-        app:layout_constraintEnd_toEndOf="@+id/textView7"
-        app:layout_constraintHorizontal_bias="0.01"
-        app:layout_constraintStart_toStartOf="@+id/textView7" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.405"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView6"
@@ -84,20 +84,19 @@
         app:layout_constraintHorizontal_bias="0.006"
         app:layout_constraintStart_toStartOf="@+id/textView8" />
 
+
     <TextView
         android:id="@+id/textView9"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="357dp"
+        android:layout_height="40dp"
         android:layout_marginBottom="28dp"
         android:fontFamily="sans-serif"
         android:text="By clicking “Create account”, you agree to our terms of use."
         android:textColor="@color/white"
         android:textSize="14dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_final"
-        app:layout_constraintEnd_toEndOf="@+id/btn_final"
-        app:layout_constraintHorizontal_bias="0.48"
-        app:layout_constraintStart_toStartOf="@+id/btn_final" />
-
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/img_backEmail2"
