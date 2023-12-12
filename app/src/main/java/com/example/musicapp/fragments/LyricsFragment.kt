@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.musicapp.R
 import com.example.musicapp.models.Song
+import com.squareup.picasso.Picasso
 
 class LyricsFragment(val song: Song): Fragment(R.layout.fragment_lyrics) {
     private lateinit var imgSong: ImageView
@@ -25,7 +26,10 @@ class LyricsFragment(val song: Song): Fragment(R.layout.fragment_lyrics) {
         tvNameSong = view.findViewById(R.id.tvNameSong)
         tvNameArtists = view.findViewById(R.id.tvNameArtists)
         tvLyrics = view.findViewById(R.id.tvLyrics)
-        imgSong.setImageDrawable(context?.resources?.getDrawable(R.drawable.alan_walker, null))
+
+        tvNameSong.text = song.name
+        tvLyrics.text = song.lyric
+        Picasso.get().load(song.image).into(imgSong);
         return view
     }
 }

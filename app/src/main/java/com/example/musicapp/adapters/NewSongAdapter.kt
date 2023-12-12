@@ -22,13 +22,11 @@ import de.hdodenhof.circleimageview.CircleImageView
 
 class NewSongAdapter(private val context: Context, private var songs: ArrayList<Song>) :  RecyclerView.Adapter<NewSongAdapter.NewSongViewHolder>()  {
 
-
-
     class NewSongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),  View.OnCreateContextMenuListener  {
         val imgSong: ImageView
         val tvNameSong: TextView
         val tvNameArtists: TextView
-        private val btnHeart: ImageButton
+        val btnHeart: ImageButton
         private val btnPlay: ImageButton
         val btnMenu: ImageButton
         init {
@@ -53,7 +51,6 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
             }
         }
 
-
         override fun onCreateContextMenu(
             menu: ContextMenu?,
             v: View?,
@@ -76,7 +73,7 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
     override fun onBindViewHolder(holder: NewSongViewHolder, position: Int) {
         val song = songs[position]
         holder.tvNameSong.text = song.name
-        val docRef : DocumentReference ?= song.artist
+        val docRef : DocumentReference ?= song.artists
 
         docRef?.addSnapshotListener { value, error ->
             if (value!=null){
@@ -87,8 +84,13 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
             }
         }
         Picasso.get().load(song.image).into(holder.imgSong);
+        holder.openTrack(context, songs)
+//
+//        holder.btnHeart.setOnClickListener{v ->
+//
+//        }
 
-          holder.btnMenu.setOnClickListener{ view ->
+        holder.btnMenu.setOnClickListener{ view ->
             val popupMenu = PopupMenu(context, view)
             popupMenu.inflate(R.menu.menu_song) // Inflate your menu resource
             popupMenu.show()

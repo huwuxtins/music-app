@@ -2,7 +2,6 @@ package com.example.musicapp.fragments
 
 import android.content.Intent
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.musicapp.R
 import com.example.musicapp.activities.MainActivity
-import com.example.musicapp.adapters.SongAdapter
+import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.TrackViewPagerAdapter
 import com.example.musicapp.models.Song
 import com.google.firebase.storage.FirebaseStorage
@@ -111,7 +110,7 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
         vpSong.currentItem = 1
 
         registerForContextMenu(rcvSong)
-        rcvSong.adapter = context?.let { SongAdapter(it, songs) }
+        rcvSong.adapter = context?.let { NewSongAdapter(it, songs) }
         rcvSong.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
 
         return view

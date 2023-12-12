@@ -6,21 +6,16 @@ import java.io.Serializable
 import java.util.Date
 
 class Song (
-    var id: String,
+    var id: Long,
     var name: String,
     var lyric: String,
     var link: String,
-    var postAt: Date,
+    var postAt: String,
+    var image: String,
     var artists: DocumentReference? = null,
 ): Serializable{
-    fun getArtists(): String {
-        if(artists.size > 2){
-            return artists[0].name + " " + artists[1].name + " and others"
-        }
-        return artists[0].name + " " + artists[1].name
-    }
 
-    constructor() :    this(0, "", "" , "","","",null)
+    constructor() :    this(0, "", "" , "","", "",null)
 
 //    fun getArtists(): String {
 //        if(artists.size > 2){

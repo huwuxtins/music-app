@@ -63,7 +63,7 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
 
             recyclerviewNewSong = view.findViewById(R.id.listNewSong)
             listNewSong = ArrayList<Song>()
-            newsongAdapter = activity?.let { NewSongAdapter(it.applicationContext,listNewSong) }!!
+            newsongAdapter = activity?.let { NewSongAdapter(view.context, listNewSong) }!!
             recyclerviewNewSong.adapter = newsongAdapter
             recyclerviewNewSong!!.layoutManager = LinearLayoutManager(requireActivity().applicationContext, LinearLayoutManager.VERTICAL, false)
             listNewSong = getListNewSong()

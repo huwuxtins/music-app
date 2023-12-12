@@ -9,8 +9,6 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.musicapp.R
 import com.example.musicapp.models.Song
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
 
 class TrackFragment(private val song: Song): Fragment(R.layout.fragment_track) {
@@ -28,13 +26,9 @@ class TrackFragment(private val song: Song): Fragment(R.layout.fragment_track) {
         tvNameArtists = view.findViewById(R.id.tvNameArtists)
 
         tvNameSong.text = song.name
-        tvNameArtists.text = song.getArtists()
+        tvNameArtists.text = "Artist";
 
-        val storage = FirebaseStorage.getInstance()
-        val storageRef: StorageReference = storage.reference.child(song.image)
-        storageRef.downloadUrl.addOnSuccessListener {
-            Picasso.get().load(it).into(imgSong)
-        }
+        Picasso.get().load(song.image).into(imgSong);
 
         return view
     }
