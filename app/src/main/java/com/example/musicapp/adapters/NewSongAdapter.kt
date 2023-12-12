@@ -77,7 +77,6 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
         val song = songs[position]
         holder.tvNameSong.text = song.name
         val docRef : DocumentReference ?= song.artist
-
         docRef?.addSnapshotListener { value, error ->
             if (value!=null){
                 val artist = value.toObject(Artist::class.java)
