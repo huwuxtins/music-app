@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
+import com.example.musicapp.adapters.AlbumAdapter
 import com.example.musicapp.adapters.ArtistsSearchAdapter
 import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.SingerAdapter
@@ -40,6 +41,7 @@ class SearchFragment(): Fragment(R.layout.fragment_search) {
     lateinit var listAlbum : ArrayList<Album>
     lateinit var singerAdapter: ArtistsSearchAdapter
     lateinit var songAdapter: NewSongAdapter
+    lateinit var albumAdapter : AlbumAdapter
     lateinit var key : String
     lateinit var db: FirebaseFirestore
 
@@ -71,6 +73,7 @@ class SearchFragment(): Fragment(R.layout.fragment_search) {
 
         songAdapter = activity?.let { NewSongAdapter(it.applicationContext,listSong) }!!
         singerAdapter = activity?.let { ArtistsSearchAdapter(it.applicationContext,listArtist) }!!
+        albumAdapter = activity?.let { AlbumAdapter(it.applicationContext,listAlbum) }!!
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
@@ -142,6 +145,27 @@ class SearchFragment(): Fragment(R.layout.fragment_search) {
 
         searchAlbum.setOnClickListener{
             setColor(searchAlbum,searchSong,searchArtist)
+            if(listAlbum.size != 0){
+                listAlbum.clear()
+            }
+
+            db.collection("Albums").get()
+                .addOnSuccessListener { result ->
+                    for (document in result) {
+                        val album = document.toObject(Album::class.java)
+                        if(album.name.contains(key)){
+                            listAlbum.add(album)
+                        }
+                    }
+                    albumAdapter.setData(listAlbum)
+                    recyclerView.adapter = albumAdapter
+                    recyclerView!!.layoutManager = LinearLayoutManager(requireActivity().applicationContext, LinearLayoutManager.VERTICAL, false)
+                    albumAdapter.notifyDataSetChanged()
+                }
+
+                .addOnFailureListener{ exception ->
+                    Toast.makeText(activity,"Error system",Toast.LENGTH_SHORT).show()
+                }
         }
 
         return view
