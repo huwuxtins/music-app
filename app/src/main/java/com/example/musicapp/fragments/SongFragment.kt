@@ -1,5 +1,6 @@
 package com.example.musicapp.fragments
 
+import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
@@ -64,6 +65,12 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
             }
             else{
                 btnPlay.setImageDrawable(context?.resources?.getDrawable(R.drawable.icon_pause, null))
+
+                val intent = Intent(activity, Song::class.java)
+                intent.putExtra("song", song)
+
+                activity?.startForegroundService(intent)
+
                 storageRef.downloadUrl.addOnSuccessListener {
                     mainActivity.mediaPlayer = MediaPlayer.create(context, it)
                     sbrMusic.max = mainActivity.mediaPlayer.duration
@@ -92,7 +99,6 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
                         override fun onStopTrackingTouch(seekBar: SeekBar?) {
                             Log.e("MyApp", "You're stopping changing seekbar")
                         }
-
                     })
                 }
             }

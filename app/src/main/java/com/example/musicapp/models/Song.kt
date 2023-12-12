@@ -1,6 +1,6 @@
 package com.example.musicapp.models
 
-import android.graphics.drawable.Drawable
+import java.io.Serializable
 import java.util.Date
 
 class Song (
@@ -11,7 +11,7 @@ class Song (
     var postAt: Date,
     var image: String,
     var artists: ArrayList<Artist>,
-){
+): Serializable{
     fun getArtists(): String {
         if(artists.size > 2){
             return artists[0].name + " " + artists[1].name + " and others"
