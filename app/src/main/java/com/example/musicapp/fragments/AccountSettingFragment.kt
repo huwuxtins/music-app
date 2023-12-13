@@ -12,12 +12,18 @@ import com.example.musicapp.R
 import com.example.musicapp.adapters.AccountSettingViewPagerAdapter
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.squareup.picasso.Picasso
 
 class AccountSettingFragment() : Fragment() {
     private lateinit var imgAvatar: ImageView
     private lateinit var tvName: TextView
     private lateinit var tabLayout: TabLayout
     private lateinit var vpEdit: ViewPager2
+    private lateinit var auth : FirebaseAuth
+    private lateinit var db : FirebaseFirestore
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -28,6 +34,9 @@ class AccountSettingFragment() : Fragment() {
         tvName = view.findViewById(R.id.tvName)
         tabLayout = view.findViewById(R.id.tabLayout)
         vpEdit = view.findViewById(R.id.vpEdit)
+        auth = FirebaseAuth.getInstance()
+        db =FirebaseFirestore.getInstance()
+
 
         val fragmentList = listOf(EditInformationFragment(), ChangePasswordFragment())
 
@@ -48,6 +57,29 @@ class AccountSettingFragment() : Fragment() {
             override fun onTabReselected(tab: TabLayout.Tab?) {
             }
         })
+
+        updateUI()
+
         return view
     }
+
+    fun updateUI(){
+        val fUser = auth.currentUser
+        val email = fUser?.email.toString()
+        val docRef = db.collection("Users").document(email)
+
+        docRef.get().addOnSuccessListener { documentSnapshot ->
+            val user = documentSnapshot.toObject(com.example.musicapp.models.User::class.java)
+            tvName.text = user?.username
+
+            val linkImg = user?.avatar.toString()
+            if(linkImg.contains("https://")){
+                Picasso.get().load(linkImg).into(imgAvatar);
+            }
+
+
+        }
+
+    }
+
 }

@@ -1,7 +1,4 @@
 package com.example.musicapp.models
-
-
-
 class User(
     var username: String,
     var email: String,

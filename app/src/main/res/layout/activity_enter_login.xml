@@ -61,6 +61,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@+id/textView3"
         app:layout_constraintTop_toBottomOf="@+id/textView3"
+        app:endIconDrawable="@drawable/password_icon"
         app:passwordToggleEnabled="true">
 
         <EditText
