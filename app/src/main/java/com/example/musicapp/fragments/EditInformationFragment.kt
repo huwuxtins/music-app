@@ -91,6 +91,10 @@ class EditInformationFragment(): Fragment() {
                             confirmPass.setText("")
                             dialog.HideDialog()
                             Toast.makeText(context,"Update successfully",Toast.LENGTH_SHORT).show()
+                            val transaction = activity?.supportFragmentManager?.beginTransaction()
+                            transaction?.replace(R.id.frgMain, InfoFragment())
+                            transaction?.addToBackStack("null")
+                            transaction?.commit()
                         }
                         .addOnFailureListener{
                             dialog.HideDialog()

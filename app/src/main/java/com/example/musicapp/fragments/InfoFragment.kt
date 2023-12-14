@@ -14,6 +14,7 @@ import com.example.musicapp.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.squareup.picasso.Picasso
 
 class InfoFragment: Fragment(R.layout.fragment_info) {
     private lateinit var imgAvatar: ImageView
@@ -56,6 +57,10 @@ class InfoFragment: Fragment(R.layout.fragment_info) {
                     val u = document.toObject(User::class.java)
                     tvName.setText(u?.username)
                     tvEmail.setText(email.toString() )
+                    val link = u?.avatar.toString()
+                    if(link.contains("https://")){
+                        Picasso.get().load(link).into(imgAvatar);
+                    }
                 }
                 else{
                     Toast.makeText(activity,"Account data does not exist", Toast.LENGTH_SHORT).show()
