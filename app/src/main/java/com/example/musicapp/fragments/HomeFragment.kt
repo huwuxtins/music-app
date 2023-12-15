@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -12,6 +13,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
+import com.example.musicapp.activities.MainActivity
 import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.SingerAdapter
 import com.example.musicapp.adapters.TypeAdapter
@@ -30,6 +32,7 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
     lateinit var typeAdpater : TypeAdapter
     lateinit var recyclerViewSinger : RecyclerView
     lateinit var singerAdapter: SingerAdapter
+    lateinit var img_account : ImageView
     private lateinit var listSinger : ArrayList<Artist>
 
     private lateinit var recyclerviewNewSong : RecyclerView
@@ -49,6 +52,7 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
             listType = createList()
             recyclerView =  view.findViewById(R.id.listKind)
             recyclerViewSinger = view.findViewById(R.id.recyclerView)
+            img_account = view.findViewById(R.id.img_account)
             db = FirebaseFirestore.getInstance()
 
             typeAdpater = activity?.let { TypeAdapter(view.context,listType) }!!
@@ -75,6 +79,14 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
                         goToArtistFragment();
                 }
             })
+
+            img_account.setOnClickListener(object : View.OnClickListener {
+                override fun onClick(view: View?) {
+                    val mainActivity = context as MainActivity
+                    mainActivity.loadFragment(InfoFragment(), "body")
+                }
+            })
+
             return view
     }
 

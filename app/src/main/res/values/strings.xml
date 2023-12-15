@@ -10,7 +10,7 @@
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-
+    <string name="defaultAvatar">https://firebasestorage.googleapis.com/v0/b/music-app-f7953.appspot.com/o/users%2Fimage.png?alt=media&amp;token=a308b9f0-1c41-485d-8e3b-72d207c7b937</string>
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus

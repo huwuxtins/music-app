@@ -63,7 +63,7 @@ class RegisterAccount : AppCompatActivity() {
                         if (task.isSuccessful) {
 //                            database = FirebaseDatabase.getInstance().getReference("Users")
                             db = FirebaseFirestore.getInstance()
-                            var user = User(name.toString(),email.toString(),password.toString(),gender.toString(),true,"image.jpg",email.toString(),"Normal");
+                            var user = User(name.toString(),email.toString(),password.toString(),gender.toString(),true,R.string.defaultAvatar.toString(),email.toString(),"Normal");
                             val newUser: HashMap<String, Any>  = user.toMap()
                             db.collection("Users").document(user.email).set(newUser)
                                 .addOnSuccessListener { documentReference ->
