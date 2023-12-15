@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -21,6 +23,7 @@ import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.TrackViewPagerAdapter
 import com.example.musicapp.models.Song
 import com.example.musicapp.services.PlayMusicService
+import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class SongFragment(private val song: Song, private val songs: ArrayList<Song>): Fragment(R.layout.fragment_song){
 //    Recycler view
@@ -36,6 +39,8 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
 //    Seekbar
     private lateinit var sbrMusic: SeekBar
 
+    private lateinit var btnMenu : ImageButton
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -50,6 +55,32 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
         sbrMusic = view.findViewById(R.id.sbrMusic)
         tvStartTime = view.findViewById(R.id.tvStartTime)
         tvEndTime = view.findViewById(R.id.tvEndTime)
+        btnMenu = view.findViewById(R.id.btnMenuSong)
+
+        val popupMenu = PopupMenu(context, btnMenu)
+        popupMenu.inflate(R.menu.menu_song2)
+
+        btnMenu.setOnClickListener{
+            popupMenu.show()
+            popupMenu.setOnMenuItemClickListener {
+                // Handle menu item click here
+                when (it.itemId) {
+                    R.id.itComment -> {
+                        showComment()
+                        true
+                    }
+
+                    R.id.itContact -> {
+
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+
+        }
+
 
 
         btnPlay.setOnClickListener{
@@ -138,5 +169,15 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
         val m = second / 60
         val s = second % 60
         return String.format("%02d:%02d", m, s)
+    }
+
+
+    fun showComment(){
+        val bottomDialogComment = BottomSheetDialog(requireActivity(),R.style.CustomBottomSheetDialogTheme)
+        val bottomCommentView =LayoutInflater.from(context).inflate(R.layout.layout_comment, view?.findViewById(R.id.commentContainer), false)
+
+
+        bottomDialogComment.setContentView(bottomCommentView)
+        bottomDialogComment.show()
     }
 }

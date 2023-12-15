@@ -131,7 +131,6 @@ class AccountSettingFragment() : Fragment() {
     }
 
 
-
     @SuppressLint("Range")
     fun getNameFromURI(uri: Uri?): String? {
         val c: Cursor? =

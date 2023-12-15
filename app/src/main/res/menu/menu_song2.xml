@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/itComment"
+        android:icon="@drawable/icon_download"
+        android:title="Comment"/>
+    <item android:id="@+id/itDownload"
+        android:icon="@drawable/icon_download"
+        android:title="Download"/>
+    <item android:id="@+id/itAddHeart"
+        android:icon="@drawable/icon_heart"
+        android:title="Add to favourite list"/>
+    <item android:id="@+id/itAddPlaylist"
+        android:icon="@drawable/icon_playlist"
+        android:title="Add to my playlist"/>
+    <item android:id="@+id/itArtist"
+        android:icon="@drawable/icon_playlist"
+        android:title="Artist"/>
+
+</menu>
