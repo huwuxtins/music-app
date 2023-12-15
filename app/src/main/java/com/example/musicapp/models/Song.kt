@@ -13,6 +13,7 @@ class Song (
     var postAt: String,
     var image: String,
     var artists: DocumentReference? = null,
+    var isLoved: Boolean = false,
 ): Serializable{
 
     constructor() :    this(0, "", "" , "","", "",null)

@@ -74,12 +74,9 @@ class Login : AppCompatActivity() {
             signInWithGoogle()
         }
 
-
         btn_facebook.setOnClickListener{
             signInWithFacebook()
         }
-
-
     }
 
     fun signInWithGoogle(){
@@ -201,7 +198,6 @@ class Login : AppCompatActivity() {
             })
     }
 
-
     @SuppressLint("SuspiciousIndentation")
     private fun handleFacebookAccessToken(token: AccessToken) {
         Log.d(TAG, "handleFacebookAccessToken:$token")
@@ -261,9 +257,7 @@ class Login : AppCompatActivity() {
                                 .show();
                             dialog.HideDialog()
                         }
-
                     }
-
                 } else {
                     Toast.makeText(
                         baseContext,

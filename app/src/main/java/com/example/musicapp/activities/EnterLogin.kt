@@ -42,7 +42,6 @@ class EnterLogin : AppCompatActivity() {
             onBackPressed();
         }
 
-
         btn_login.setOnClickListener {
             var email = edt_email.text.toString();
             var password = edt_password.text.toString();
@@ -84,7 +83,5 @@ class EnterLogin : AppCompatActivity() {
             val intent = Intent(this, ForgotPassword::class.java)
             startActivity(intent)
         }
-
-
     }
 }

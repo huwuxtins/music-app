@@ -1,6 +1,7 @@
 package com.example.musicapp.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,24 +49,23 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
             listType = createList()
             recyclerView =  view.findViewById(R.id.listKind)
             recyclerViewSinger = view.findViewById(R.id.recyclerView)
-             db = FirebaseFirestore.getInstance()
+            db = FirebaseFirestore.getInstance()
 
-            typeAdpater = activity?.let { TypeAdapter(it.applicationContext,listType) }!!
+            typeAdpater = activity?.let { TypeAdapter(view.context,listType) }!!
             recyclerView.adapter = typeAdpater
-            recyclerView!!.layoutManager = LinearLayoutManager(requireActivity().applicationContext, LinearLayoutManager.HORIZONTAL, false)
+            recyclerView!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
 
             listSinger = ArrayList<Artist>()
-            singerAdapter = activity?.let { SingerAdapter(it.applicationContext,listSinger) }!!
+            singerAdapter = activity?.let { SingerAdapter(view.context,listSinger) }!!
             recyclerViewSinger.adapter = singerAdapter
-            recyclerViewSinger!!.layoutManager = LinearLayoutManager(requireActivity().applicationContext, LinearLayoutManager.HORIZONTAL, false)
+            recyclerViewSinger!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
             listSinger = getListSinger()
-
 
             recyclerviewNewSong = view.findViewById(R.id.listNewSong)
             listNewSong = ArrayList<Song>()
             newsongAdapter = activity?.let { NewSongAdapter(view.context, listNewSong) }!!
             recyclerviewNewSong.adapter = newsongAdapter
-            recyclerviewNewSong!!.layoutManager = LinearLayoutManager(requireActivity().applicationContext, LinearLayoutManager.VERTICAL, false)
+            recyclerviewNewSong!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
             listNewSong = getListNewSong()
 
             txt_singer = view.findViewById(R.id.txt_singer)
@@ -74,12 +74,9 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
                 override fun onClick(view: View?) {
                         goToArtistFragment();
                 }
-
             })
-
             return view
     }
-
 
     private fun createList() : ArrayList<Type>{
         val l : ArrayList<Type> = ArrayList<Type>()
@@ -107,7 +104,6 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
             .addOnFailureListener { exception ->
 
             }
-
         return l
     }
 
@@ -136,6 +132,5 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
         transaction?.addToBackStack("null")
         transaction?.commit()
     }
-
 
 }

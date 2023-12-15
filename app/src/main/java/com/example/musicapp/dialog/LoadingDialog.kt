@@ -11,7 +11,7 @@ import com.example.musicapp.R
 
 
 class LoadingDialog {
-    lateinit var activity: Activity
+    var activity: Activity
     lateinit var text : TextView
     lateinit var isdialog : AlertDialog
 

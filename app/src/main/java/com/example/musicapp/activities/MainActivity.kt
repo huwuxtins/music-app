@@ -3,10 +3,7 @@ package com.example.musicapp.activities
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.MenuItem
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
 import com.example.musicapp.R
 import com.example.musicapp.fragments.HomeFragment
@@ -17,14 +14,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
     private lateinit var bottomNav: BottomNavigationView
-    lateinit var mediaPlayer: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         bottomNav = findViewById(R.id.btNav)
-        mediaPlayer = MediaPlayer()
 
         val homeFragment = HomeFragment()
         val searchFragment = SearchFragment()
@@ -55,8 +50,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
-
     }
 
     fun loadFragment(fragment: Fragment, stackName: String){

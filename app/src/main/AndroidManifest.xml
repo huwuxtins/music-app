@@ -67,6 +67,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".services.PlayMusicService"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false">
+        </service>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

@@ -60,7 +60,7 @@ class LibraryFragment() : Fragment(R.layout.fragment_library) {
             try {
                 playlistController.getPlaylistByName("Lovely", onComplete = {
 
-                    mainActivity.loadFragment(PlaylistFragment(it[0]), "body")
+                    mainActivity.loadFragment(PlaylistFragment(it), "body")
                 })
             }
             catch (e : Exception){
@@ -71,7 +71,7 @@ class LibraryFragment() : Fragment(R.layout.fragment_library) {
             mainActivity.loadFragment(DownloadFragment(), "body")
         }
 
-        playlistController.getPlaylistByName("Lovely", onComplete = {
+        playlistController.getAllPlaylist(onComplete = {
             val playlistAdapter = PlaylistAdapter(view.context, it)
             rcvPlaylist.adapter = playlistAdapter
             rcvPlaylist.layoutManager =

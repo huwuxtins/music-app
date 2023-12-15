@@ -43,9 +43,7 @@ class InfoFragment: Fragment(R.layout.fragment_info) {
         return view
     }
 
-
-
-    fun showInfo(){
+    private fun showInfo(){
         val user = auth.currentUser
         val email = user?.providerData?.get(1)?.email
         val docRef: DocumentReference = db.collection("Users").document(email.toString())
@@ -55,8 +53,8 @@ class InfoFragment: Fragment(R.layout.fragment_info) {
 
                 if(document.exists()){
                     val u = document.toObject(User::class.java)
-                    tvName.setText(u?.username)
-                    tvEmail.setText(email.toString() )
+                    tvName.text = u?.username
+                    tvEmail.text = email.toString()
                     val link = u?.avatar.toString()
                     if(link.contains("https://")){
                         Picasso.get().load(link).into(imgAvatar);

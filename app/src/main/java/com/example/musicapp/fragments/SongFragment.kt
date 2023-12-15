@@ -1,7 +1,9 @@
 package com.example.musicapp.fragments
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
-import android.media.MediaPlayer
+import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -15,14 +17,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.musicapp.R
-import com.example.musicapp.activities.MainActivity
 import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.TrackViewPagerAdapter
 import com.example.musicapp.models.Song
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import java.util.Timer
-import java.util.TimerTask
+import com.example.musicapp.services.PlayMusicService
 
 class SongFragment(private val song: Song, private val songs: ArrayList<Song>): Fragment(R.layout.fragment_song){
 //    Recycler view
@@ -31,6 +29,7 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
     private lateinit var vpSong: ViewPager2
 //    Button
     private lateinit var btnPlay: ImageButton
+    private lateinit var btnPause: ImageButton
 //    TextView
     private lateinit var tvStartTime: TextView
     private lateinit var tvEndTime: TextView
@@ -46,64 +45,57 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
         rcvSong = view.findViewById(R.id.rcvSong)
         vpSong = view.findViewById(R.id.vpSong)
 
-        val mainActivity = context as MainActivity
-
         btnPlay = view.findViewById(R.id.btnPlay)
+        btnPause = view.findViewById(R.id.btnPause)
         sbrMusic = view.findViewById(R.id.sbrMusic)
         tvStartTime = view.findViewById(R.id.tvStartTime)
         tvEndTime = view.findViewById(R.id.tvEndTime)
 
-        val storage = FirebaseStorage.getInstance()
-        val storageRef: StorageReference = storage.reference.child(song.link)
 
         btnPlay.setOnClickListener{
-            Log.e("MyApp", "Initialize: " + mainActivity.mediaPlayer.isPlaying.toString())
-            if(mainActivity.mediaPlayer.isPlaying){
-                mainActivity.mediaPlayer.stop()
-                btnPlay.setImageDrawable(context?.resources?.getDrawable(R.drawable.icon_play, null))
-            }
-            else{
-                btnPlay.setImageDrawable(context?.resources?.getDrawable(R.drawable.icon_pause, null))
+            val intent = Intent(activity, PlayMusicService::class.java)
+            intent.putExtra("song", song)
+            intent.action = "MUSIC_PLAY"
+            btnPlay.visibility = View.INVISIBLE
+            btnPause.visibility = View.VISIBLE
 
-                val intent = Intent(activity, Song::class.java)
-                intent.putExtra("song", song)
+            activity?.startForegroundService(intent)
+        }
 
-                activity?.startForegroundService(intent)
+        btnPause.setOnClickListener{
+            val intent = Intent(activity, PlayMusicService::class.java)
+            intent.action = "MUSIC_STOP"
+            btnPause.visibility = View.INVISIBLE
+            btnPlay.visibility = View.VISIBLE
 
-                storageRef.downloadUrl.addOnSuccessListener {
-                    mainActivity.mediaPlayer = MediaPlayer.create(context, it)
-                    sbrMusic.max = mainActivity.mediaPlayer.duration
-                            tvEndTime.text = convertToMinute(mainActivity.mediaPlayer.duration)
-                    mainActivity.mediaPlayer.start()
-
-                    Timer().scheduleAtFixedRate(object: TimerTask() {
-                        override fun run() {
-                            sbrMusic.progress = mainActivity.mediaPlayer.currentPosition
-                        }
-                    }, 0, 500)
-
-                    sbrMusic.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
-                        override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                            if (seekBar != null) {
-                                tvStartTime.text = convertToMinute(seekBar.progress)
-                                tvEndTime.text = convertToMinute(mainActivity.mediaPlayer.duration - seekBar.progress)
-                            }
-                            mainActivity.mediaPlayer.seekTo(progress)
-                        }
-
-                        override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                            Log.e("MyApp", "You're changing seekbar")
-                        }
-
-                        override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                            Log.e("MyApp", "You're stopping changing seekbar")
-                        }
-                    })
-                }
-            }
+            activity?.startForegroundService(intent)
         }
 
         val fragmentList = listOf(DetailSongFragment(song), TrackFragment(song), LyricsFragment(song))
+
+        sbrMusic.setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (seekBar != null) {
+                    tvStartTime.text = convertToMinute(seekBar.progress)
+                    tvEndTime.text = convertToMinute(seekBar.max - seekBar.progress)
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                Log.e("MyApp", "You're changing seekbar")
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                Log.e("MyApp", "You're stopping changing seekbar")
+                if (seekBar != null) {
+                    Intent().also { intent ->
+                        intent.action = "com.example.updateMedia"
+                        intent.putExtra("currentDuration", seekBar.progress)
+                        context?.sendBroadcast(intent)
+                    }
+                }
+            }
+        })
 
         vpSong.adapter =
             activity?.let { TrackViewPagerAdapter(fragmentList, it.supportFragmentManager, lifecycle) }
@@ -115,6 +107,31 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
 
         return view
     }
+
+    private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (intent.action == "com.example.updateSeekBar") {
+                val currentPosition = intent.getIntExtra("currentPosition", 0)
+                val max = intent.getIntExtra("max", 0)
+
+                sbrMusic.max = max
+                sbrMusic.progress = currentPosition
+            }
+        }
+    }
+
+    // ... (existing code)
+
+    override fun onResume() {
+        super.onResume()
+        requireActivity().registerReceiver(receiver, IntentFilter("com.example.updateSeekBar"))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        requireActivity().unregisterReceiver(receiver)
+    }
+
 
     fun convertToMinute(millisecond: Int): String {
         val second = millisecond / 1000
