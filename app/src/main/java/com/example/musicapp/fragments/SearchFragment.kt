@@ -71,7 +71,7 @@ class SearchFragment(): Fragment(R.layout.fragment_search) {
         listAlbum = ArrayList()
         listArtist = ArrayList()
 
-        songAdapter = activity?.let { NewSongAdapter(it.applicationContext,listSong) }!!
+        songAdapter = activity?.let { NewSongAdapter(it.applicationContext,listSong, false) }!!
         singerAdapter = activity?.let { ArtistsSearchAdapter(it.applicationContext,listArtist) }!!
         albumAdapter = activity?.let { AlbumAdapter(it.applicationContext,listAlbum) }!!
 

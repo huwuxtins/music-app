@@ -82,11 +82,10 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
         }
 
 
-
         btnPlay.setOnClickListener{
             val intent = Intent(activity, PlayMusicService::class.java)
             intent.putExtra("song", song)
-            intent.action = "MUSIC_PLAY"
+            intent.action = "MUSIC_RESUME"
             btnPlay.visibility = View.INVISIBLE
             btnPause.visibility = View.VISIBLE
 
@@ -95,7 +94,7 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
 
         btnPause.setOnClickListener{
             val intent = Intent(activity, PlayMusicService::class.java)
-            intent.action = "MUSIC_STOP"
+            intent.action = "MUSIC_PAUSE"
             btnPause.visibility = View.INVISIBLE
             btnPlay.visibility = View.VISIBLE
 
@@ -113,14 +112,13 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                Log.e("MyApp", "You're changing seekbar")
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
                 Log.e("MyApp", "You're stopping changing seekbar")
                 if (seekBar != null) {
                     Intent().also { intent ->
-                        intent.action = "com.example.updateMedia"
+                        intent.action = "UPDATE_MUSIC"
                         intent.putExtra("currentDuration", seekBar.progress)
                         context?.sendBroadcast(intent)
                     }
@@ -133,7 +131,7 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
         vpSong.currentItem = 1
 
         registerForContextMenu(rcvSong)
-        rcvSong.adapter = context?.let { NewSongAdapter(it, songs) }
+        rcvSong.adapter = context?.let { NewSongAdapter(it, songs, true) }
         rcvSong.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
 
         return view
@@ -150,8 +148,6 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
             }
         }
     }
-
-    // ... (existing code)
 
     override fun onResume() {
         super.onResume()

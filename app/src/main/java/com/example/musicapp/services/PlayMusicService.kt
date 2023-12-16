@@ -1,7 +1,9 @@
 package com.example.musicapp.services
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -23,11 +25,17 @@ import com.example.musicapp.models.Song
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 
-class PlayMusicService(): Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
+class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
     private var mMediaPlayer: MediaPlayer? = null
     private var handler: Handler? = null
     private val sharedPreferencesKey = "last_played_position"
+
+    private val channelId = "YOUR_CHANNEL_ID"
+    private val notificationId = 100
+
+    private var song: Song? = null
+
 
     private val updateSeekBarRunnable: Runnable = object : Runnable {
         override fun run() {
@@ -45,7 +53,6 @@ class PlayMusicService(): Service(), MediaPlayer.OnPreparedListener, MediaPlayer
                     }
                 } catch (e: Exception) {
                     // Handle the IllegalStateException (e.g., log the error)
-//                    Log.e("MyApp", "Error checking if MediaPlayer is playing: ${e.message}")
                 }
             }
 
@@ -53,14 +60,32 @@ class PlayMusicService(): Service(), MediaPlayer.OnPreparedListener, MediaPlayer
         }
     }
 
-
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if(intent?.action == "com.example.updateMedia"){
+            Log.e("MyApp", "Intent's action: ${intent?.action}")
+            if(intent?.action == "UPDATE_MUSIC"){
                 val duration = intent.getIntExtra("currentDuration", 0)
-                Log.e("MyApp", "Duration of change seekbar: $duration")
                 saveLastPlayedPosition(duration)
                 mMediaPlayer?.seekTo(duration)
+            }
+            else if(intent?.action == "PAUSE_MUSIC"){
+                mMediaPlayer?.pause()
+                updateNotification(getNotification("STATUS_PAUSE"))
+            }
+            else if(intent?.action == "PLAY_MUSIC"){
+                mMediaPlayer?.start()
+                updateNotification(getNotification("STATUS_PLAY"))
+
+            }
+            else if(intent?.action == "PREV_MUSIC"){
+
+            }
+            else if(intent?.action == "NEXT_MUSIC"){
+
+            }
+            else if(intent?.action == "CLOSE_MUSIC"){
+                stopForeground(STOP_FOREGROUND_REMOVE)
+                stopSelf()
             }
         }
     }
@@ -68,29 +93,10 @@ class PlayMusicService(): Service(), MediaPlayer.OnPreparedListener, MediaPlayer
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        val song = intent?.extras?.getSerializable("song") as? Song
-        val channelId = "YOUR_CHANNEL_ID"
-        val notificationId = 100
+        song = intent?.extras?.getSerializable("song") as? Song
 
-        val mediaSessionCompat = MediaSessionCompat(this, "tag")
+        val notification = getNotification("STATUS_PLAY")
 
-        val notification = NotificationCompat.Builder(this, channelId)
-            // Show controls on lock screen even when user hides sensitive content.
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setSmallIcon(R.drawable.logo_music_app)
-            // Add media control buttons that invoke intents in your media service
-            .addAction(R.drawable.icon_pre, "Previous", null) // #0
-            .addAction(R.drawable.icon_pause, "Pause", null) // #1
-            .addAction(R.drawable.icon_next, "Next", null) // #2
-            // Apply the media style template.
-            .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
-                .setShowActionsInCompactView(1 /* #1: pause button \*/)
-                .setMediaSession(mediaSessionCompat.sessionToken))
-            .setContentTitle("Music App")
-            .setContentText(song?.name)
-            .build()
-
-//      Create a notification channel (for Android Oreo and above)
         val channel = NotificationChannel(
             channelId,
             "Music Channel",
@@ -100,8 +106,17 @@ class PlayMusicService(): Service(), MediaPlayer.OnPreparedListener, MediaPlayer
         notificationManager.createNotificationChannel(channel)
 
         when(intent?.action) {
-            "MUSIC_STOP" -> {
-                mMediaPlayer?.stop()
+            "MUSIC_PAUSE" -> {
+                mMediaPlayer?.pause()
+                updateNotification(getNotification("STATUS_PAUSE"))
+                return START_STICKY
+            }
+
+            "MUSIC_RESUME" -> {
+                mMediaPlayer?.start()
+                Log.e("MyApp", "MUSIC_RESUME")
+                updateNotification(getNotification("STATUS_PLAY"))
+                return START_STICKY
             }
 
             "MUSIC_PLAY", "NEW_MUSIC_PLAY" -> {
@@ -115,7 +130,12 @@ class PlayMusicService(): Service(), MediaPlayer.OnPreparedListener, MediaPlayer
                         saveLastPlayedPosition(0)
                     }
                     val storage = FirebaseStorage.getInstance()
-                    val storageRef: StorageReference = storage.reference.child(song.link)
+
+                    val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().putLong("song_id", song!!.id).apply()
+
+                    val storageRef: StorageReference = storage.reference.child(song!!.link)
+
                     storageRef.downloadUrl.addOnSuccessListener { uri ->
                         mMediaPlayer = MediaPlayer()
                         mMediaPlayer?.apply {
@@ -143,6 +163,7 @@ class PlayMusicService(): Service(), MediaPlayer.OnPreparedListener, MediaPlayer
         ServiceCompat.startForeground(this, notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
         return START_STICKY
     }
+
     override fun onPrepared(mediaPlayer: MediaPlayer) {
         mediaPlayer.start()
         val lastPlayedPosition = getLastPlayedPosition()
@@ -151,8 +172,20 @@ class PlayMusicService(): Service(), MediaPlayer.OnPreparedListener, MediaPlayer
         handler = Handler()
         handler?.post(updateSeekBarRunnable)
 
-        val filter = IntentFilter("com.example.updateMedia")
-        registerReceiver(receiver, filter)
+        val updateFilter = IntentFilter("UPDATE_MUSIC")
+        registerReceiver(receiver, updateFilter)
+        val pauseFilter = IntentFilter("PAUSE_MUSIC")
+        registerReceiver(receiver, pauseFilter)
+        val playFilter = IntentFilter("PLAY_MUSIC")
+        registerReceiver(receiver, playFilter)
+        val closeFilter = IntentFilter("CLOSE_MUSIC")
+        registerReceiver(receiver, closeFilter)
+    }
+
+    private fun updateNotification(notification: Notification) {
+        Log.e("MyApp", "Updating notification")
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.notify(notificationId, notification)
     }
 
     private fun saveLastPlayedPosition(position: Int) {
@@ -178,5 +211,54 @@ class PlayMusicService(): Service(), MediaPlayer.OnPreparedListener, MediaPlayer
 
     override fun onBind(intent: Intent?): IBinder? {
         TODO("Not yet implemented")
+    }
+
+    fun getNotification(status: String): Notification{
+        val mediaSessionCompat = MediaSessionCompat(this, "tag")
+
+        val pauseIntent = Intent()
+        pauseIntent.action = "PAUSE_MUSIC"
+        val pendingIntentPause = PendingIntent.getBroadcast(this, 12345, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val playIntent = Intent()
+        playIntent.action = "PLAY_MUSIC"
+        val pendingIntentPlay = PendingIntent.getBroadcast(this, 12345, playIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val closeIntent = Intent()
+        closeIntent.action = "CLOSE_MUSIC"
+        val pendingIntentClose = PendingIntent.getBroadcast(this, 12345, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        if(status == "STATUS_PLAY"){
+            return  NotificationCompat.Builder(this, channelId)
+                // Show controls on lock screen even when user hides sensitive content.
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setSmallIcon(R.drawable.logo_music_app)
+                // Add media control buttons that invoke intents in your media service
+                .addAction(R.drawable.icon_pre, "Previous", null) // #0
+                .addAction(R.drawable.icon_pause, "Pause", pendingIntentPause) // #1
+                .addAction(R.drawable.icon_next, "Next", null) // #2
+                .addAction(R.drawable.icon_close, "Close", pendingIntentClose) //  #3
+                // Apply the media style template.
+                .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
+                    .setShowActionsInCompactView(1 /* #1: pause button \*/)
+                    .setMediaSession(mediaSessionCompat.sessionToken))
+                .setContentTitle(song?.name)
+                .build()
+        }
+        return NotificationCompat.Builder(this, channelId)
+            // Show controls on lock screen even when user hides sensitive content.
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setSmallIcon(R.drawable.logo_music_app)
+            // Add media control buttons that invoke intents in your media service
+            .addAction(R.drawable.icon_pre, "Previous", null) // #0
+            .addAction(R.drawable.icon_play, "Play", pendingIntentPlay) // #1
+            .addAction(R.drawable.icon_next, "Next", null) // #2
+            .addAction(R.drawable.icon_close, "Close", pendingIntentClose) // #3
+            // Apply the media style template.
+            .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
+                .setShowActionsInCompactView(1 /* #1: pause button \*/)
+                .setMediaSession(mediaSessionCompat.sessionToken))
+            .setContentTitle(song?.name)
+            .build()
     }
 }

@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.Nullable
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.example.musicapp.activities.MainActivity
@@ -27,7 +28,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.squareup.picasso.Picasso
 import java.time.LocalDate
 
-class NewSongAdapter(private val context: Context, private var songs: ArrayList<Song>) :  RecyclerView.Adapter<NewSongAdapter.NewSongViewHolder>()  {
+class NewSongAdapter(private val context: Context, private var songs: ArrayList<Song>, private val isSongFragment: Boolean?) :  RecyclerView.Adapter<NewSongAdapter.NewSongViewHolder>()  {
 
     private var playlistController: PlaylistController = PlaylistController()
     class NewSongViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),  View.OnCreateContextMenuListener  {
@@ -46,38 +47,34 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
             btnMenu = itemView.findViewById(R.id.btnMenu)
         }
 
-        fun openTrack(context: Context, songs: ArrayList<Song>){
+        fun openTrack(context: Context, songs: ArrayList<Song>, stackName: String){
             val song: Song = songs[adapterPosition]
+            val mainActivity = context as MainActivity
+            val songFragment = SongFragment(song, songs)
+
+            val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+            val songId = sharedPreferences.getLong("song_id", 0)
+
+            val intent = Intent(mainActivity, PlayMusicService::class.java)
+            intent.putExtra("song", song)
+            intent.action = "NEW_MUSIC_PLAY"
+
+            if(songId == song.id){
+                intent.action = "MUSIC_CONTINUE"
+            }
+
             imgSong.setOnClickListener{
-                val mainActivity = context as MainActivity
+                mainActivity.loadFragment(songFragment, stackName)
 
-                val songFragment = SongFragment(song, songs)
-                mainActivity.loadFragment(songFragment, "body")
-
-                val intent = Intent(mainActivity, PlayMusicService::class.java)
-                intent.putExtra("song", song)
-                intent.action = "NEW_MUSIC_PLAY"
                 mainActivity.startForegroundService(intent)
             }
             tvNameSong.setOnClickListener{
-                val mainActivity = context as MainActivity
-                val songFragment = SongFragment(song, songs)
-                mainActivity.loadFragment(songFragment, "body")
-
-                val intent = Intent(mainActivity, PlayMusicService::class.java)
-                intent.putExtra("song", song)
-                intent.action = "NEW_MUSIC_PLAY"
+                mainActivity.loadFragment(songFragment, stackName)
                 mainActivity.startForegroundService(intent)
             }
 
             btnPlay.setOnClickListener {
-                val mainActivity = context as MainActivity
-                val songFragment = SongFragment(song, songs)
-                mainActivity.loadFragment(songFragment, "body")
-
-                val intent = Intent(mainActivity, PlayMusicService::class.java)
-                intent.putExtra("song", song)
-                intent.action = "NEW_MUSIC_PLAY"
+                mainActivity.loadFragment(songFragment, stackName)
                 mainActivity.startForegroundService(intent)
             }
         }
@@ -115,7 +112,11 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
             }
         }
         Picasso.get().load(song.image).into(holder.imgSong)
-        holder.openTrack(context, songs)
+        var stackName = "body"
+        if(isSongFragment == true){
+            stackName = "music"
+        }
+        holder.openTrack(context, songs, stackName)
 
         if(!song.isLoved) {
             holder.btnHeart.setImageResource(R.drawable.icon_heart)
@@ -177,8 +178,13 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
                             val playlist = Playlist(name, "", LocalDate.now().toString(), "")
                             playlistController.addPlaylist(playlist, onComplete = {
                                 Toast.makeText(context, "Add playlist successfully!", Toast.LENGTH_LONG).show()
+                                playlistController.updatePlaylist("add", song, name, onComplete = {
+                                    Toast.makeText(context, "Adding song to playlist successfully!", Toast.LENGTH_LONG).show()
+                                }, onFail = {
+                                    Toast.makeText(context, "Adding song to playlist failed!", Toast.LENGTH_LONG).show()
+                                })
                             }, onFail = {
-                                Toast.makeText(context, "Add playlist failed!", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, "Name's playlist was existed", Toast.LENGTH_LONG).show()
                             })
                             dialog.dismiss()
                         }

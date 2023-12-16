@@ -64,9 +64,16 @@ class MainActivity : AppCompatActivity() {
                     R.anim.slide_up, R.anim.fade_out, R.anim.fade_in, R.anim.slide_down
                 )
             }
+            else if(stackName == "music"){
+                this.setCustomAnimations(
+                    R.anim.slide_up, R.anim.fade_out, R.anim.fade_in, R.anim.slide_down
+                )
+            }
 
             replace(R.id.frgMain, fragment)
-            addToBackStack(stackName)
+            if(stackName != "music"){
+                addToBackStack(stackName)
+            }
         }
     }
 }

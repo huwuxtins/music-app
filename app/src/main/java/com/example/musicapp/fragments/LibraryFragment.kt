@@ -83,7 +83,7 @@ class LibraryFragment() : Fragment(R.layout.fragment_library) {
         rcvArtist.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
 
-        val songAdapter = NewSongAdapter(view.context, songs1)
+        val songAdapter = NewSongAdapter(view.context, songs1, false)
         rcvSong.adapter = songAdapter
         rcvSong.hasFixedSize()
         rcvSong.layoutManager =

@@ -13,9 +13,6 @@ import com.example.musicapp.adapters.PlaylistAdapter
 import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Playlist
 import com.example.musicapp.models.Song
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.Date
 
 class DownloadFragment(): Fragment() {
     private lateinit var rcvPlaylist: RecyclerView
@@ -40,7 +37,7 @@ class DownloadFragment(): Fragment() {
         rcvPlaylist.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
 
-        val songAdapter = NewSongAdapter(view.context, songs1)
+        val songAdapter = NewSongAdapter(view.context, songs1, false)
         rcvSong.adapter = songAdapter
         rcvSong.hasFixedSize()
         rcvSong.layoutManager =

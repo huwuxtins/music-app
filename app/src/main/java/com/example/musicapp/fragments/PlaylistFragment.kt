@@ -43,7 +43,7 @@ class PlaylistFragment(val playlist: Playlist) : Fragment(R.layout.fragment_play
         val mainActivity = context as MainActivity
         tvName.text = playlist.name
 
-        rcvSong.adapter = context?.let { NewSongAdapter(it, playlist.songs) }
+        rcvSong.adapter = context?.let { NewSongAdapter(it, playlist.songs, false) }
         rcvSong.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
 
         btnRandom.setOnClickListener{
