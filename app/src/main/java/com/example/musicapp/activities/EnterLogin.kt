@@ -1,7 +1,6 @@
 package com.example.musicapp.activities
 
 import android.content.Intent
-import android.health.connect.datatypes.units.Length
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
@@ -11,7 +10,6 @@ import android.widget.TextView
 import android.widget.Toast
 import com.example.musicapp.R
 import com.example.musicapp.dialog.LoadingDialog
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 
 class EnterLogin : AppCompatActivity() {
@@ -54,6 +52,7 @@ class EnterLogin : AppCompatActivity() {
                 ).show()
             } else {
                     dialog.ShowDialog("Login...")
+
                     firebaseAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(this) { task ->
                             if (task.isSuccessful) {

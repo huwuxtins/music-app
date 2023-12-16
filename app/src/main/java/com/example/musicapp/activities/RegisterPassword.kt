@@ -10,9 +10,6 @@ import android.widget.ImageView
 import android.widget.Toast
 import com.example.musicapp.R
 import com.example.musicapp.dialog.LoadingDialog
-import com.example.musicapp.models.User
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 
 class RegisterPassword : AppCompatActivity() {
 

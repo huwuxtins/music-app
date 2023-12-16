@@ -53,6 +53,8 @@ class RegisterAccount : AppCompatActivity() {
             var password = sharedPreference.getString("password","null");
             var gender = chooseGender.selectedItem.toString();
 
+
+
             if(name.equals("")){
                 Toast.makeText(applicationContext,"Please enter your name",Toast.LENGTH_SHORT).show()
             }
@@ -63,7 +65,8 @@ class RegisterAccount : AppCompatActivity() {
                         if (task.isSuccessful) {
 //                            database = FirebaseDatabase.getInstance().getReference("Users")
                             db = FirebaseFirestore.getInstance()
-                            var user = User(name.toString(),email.toString(),password.toString(),gender.toString(),true,R.string.defaultAvatar.toString(),email.toString(),"Normal");
+                            val linkAvatar = resources.getString(R.string.defaultAvatar);
+                            var user = User(name.toString(),email.toString(),password.toString(),gender.toString(),true,linkAvatar,email.toString(),"Normal");
                             val newUser: HashMap<String, Any>  = user.toMap()
                             db.collection("Users").document(user.email).set(newUser)
                                 .addOnSuccessListener { documentReference ->
