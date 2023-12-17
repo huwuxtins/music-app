@@ -5,6 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <ImageButton
+        android:id="@+id/img_delete"
+        android:layout_width="46dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="40dp"
+        android:background="@null"
+        android:src="@drawable/delete"
+        app:layout_constraintBottom_toBottomOf="@+id/usernameCmt"
+        app:layout_constraintStart_toEndOf="@+id/usernameCmt"
+        app:layout_constraintTop_toTopOf="@+id/usernameCmt" />
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/circleImageView"
         android:layout_width="34dp"
@@ -33,7 +44,7 @@
         android:id="@+id/comment"
         android:layout_width="291dp"
         android:layout_height="33dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:text="Bai hat qua hay!"
         android:textColor="@color/black"
         android:textSize="13dp"

@@ -198,7 +198,7 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
         val bottomCommentView =LayoutInflater.from(context).inflate(R.layout.layout_comment, view?.findViewById(R.id.commentContainer), false)
         val listCmt = song.getCommentsUser()
         if(listCmt != null ){
-            commentAdapter  = context?.let { CommentAdapter(it,listCmt) }!!
+            commentAdapter  = context?.let { CommentAdapter(it,listCmt,song) }!!
             val recyclerView : RecyclerView = bottomCommentView.findViewById(R.id.listCmt)
             val title : TextView = bottomCommentView.findViewById(R.id.textView11)
             title.text = "Comment "+ "(" + listCmt.size + ")"
