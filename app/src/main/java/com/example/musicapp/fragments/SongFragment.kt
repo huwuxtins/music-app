@@ -225,86 +225,92 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
                             Toast.makeText(context,"Please enter your comment",Toast.LENGTH_SHORT).show()
                         }
                         else{
+                            if(content.length > 40){
+                                Toast.makeText(context,"Comment length is limited to 40 characters",Toast.LENGTH_SHORT).show()
+                            }
+                            else{
+                                this.dialog = LoadingDialog(requireActivity())
 
-                            this.dialog = LoadingDialog(requireActivity())
+                                this.dialog.ShowDialog("Send Comment")
 
-                            this.dialog.ShowDialog("Send Comment")
+                                val docRefCmt = db.collection("Comments").document()
+                                val id = docRefCmt.id
 
-                            val docRefCmt = db.collection("Comments").document()
-                            val id = docRefCmt.id
+                                val fUser =auth.currentUser
+                                val email = fUser?.email.toString()
 
-                            val fUser =auth.currentUser
-                            val email = fUser?.email.toString()
+                                //  Toast.makeText(context,id.toString(),Toast.LENGTH_SHORT).show()
 
-                          //  Toast.makeText(context,id.toString(),Toast.LENGTH_SHORT).show()
+                                val userRef : DocumentReference = db.collection("Users").document(email)
 
-                            val userRef : DocumentReference = db.collection("Users").document(email)
-
-                            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")
-                            val current = LocalDateTime.now().format(formatter)
+                                val formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")
+                                val current = LocalDateTime.now().format(formatter)
 
 
-                            val newComment = Comment(id.toString(),userRef,current,content) // tao comment moi
+                                val newComment = Comment(id.toString(),userRef,current,content) // tao comment moi
 
-                            db.collection("Comments").document(id).set(newComment)
-                                .addOnSuccessListener { doc ->
-                                    var listOldCmt  : ArrayList<String>? = song.comments
-                                    val songRef = db.collection("Songs").document(song.id.toString())
+                                db.collection("Comments").document(id).set(newComment)
+                                    .addOnSuccessListener { doc ->
+                                        var listOldCmt  : ArrayList<String>? = song.comments
+                                        val songRef = db.collection("Songs").document(song.id.toString())
 
-                                    if(listOldCmt == null || listOldCmt.size == 0){
-                                        listOldCmt = ArrayList<String>()
-                                        listOldCmt?.add("Comments/"+ id)
-                                        song.comments = listOldCmt
-                                        songRef.set(song)
-                                            .addOnSuccessListener {
-                                                Toast.makeText(context,"Send comment successfully",Toast.LENGTH_SHORT).show()
-                                                edt_cmt.setText("")
-                                                song.getCommentsUser()
-                                                    ?.let { it1 -> commentAdapter.setData(it1) }
+                                        if(listOldCmt == null || listOldCmt.size == 0){
+                                            listOldCmt = ArrayList<String>()
+                                            listOldCmt?.add("Comments/"+ id)
+                                            song.comments = listOldCmt
+                                            songRef.set(song)
+                                                .addOnSuccessListener {
+                                                    Toast.makeText(context,"Send comment successfully",Toast.LENGTH_SHORT).show()
+                                                    edt_cmt.setText("")
+                                                    song.getCommentsUser()
+                                                        ?.let { it1 -> commentAdapter.setData(it1) }
 
-                                                commentAdapter.notifyDataSetChanged()
+                                                    commentAdapter.notifyDataSetChanged()
 
-                                                title.text = "Comment "+ "(" + listOldCmt?.size + ")"
+                                                    title.text = "Comment "+ "(" + listOldCmt?.size + ")"
 
-                                                this.dialog.HideDialog()
-                                            }
+                                                    this.dialog.HideDialog()
+                                                }
 
-                                            .addOnFailureListener{
-                                                Toast.makeText(context,"Send comment failed",Toast.LENGTH_SHORT).show()
-                                                this.dialog.HideDialog()
-                                            }
+                                                .addOnFailureListener{
+                                                    Toast.makeText(context,"Send comment failed",Toast.LENGTH_SHORT).show()
+                                                    this.dialog.HideDialog()
+                                                }
+                                        }
+                                        else{
+                                            listOldCmt?.add("Comments/"+ id)
+                                            songRef.update("comments",listOldCmt)
+                                                .addOnSuccessListener {
+                                                    Toast.makeText(context,"Send comment successfully",Toast.LENGTH_SHORT).show()
+                                                    edt_cmt.setText("")
+
+                                                    song.comments   = listOldCmt
+                                                    song.getCommentsUser()
+                                                        ?.let { it1 -> commentAdapter.setData(it1) }
+
+                                                    commentAdapter.notifyDataSetChanged()
+
+                                                    title.text = "Comment "+ "(" + listOldCmt?.size + ")"
+
+                                                    this.dialog.HideDialog()
+
+                                                }
+                                                .addOnFailureListener{
+                                                    Toast.makeText(context,"Send comment failed",Toast.LENGTH_SHORT).show()
+                                                    this.dialog.HideDialog()
+                                                }
+                                        }
+
+
                                     }
-                                    else{
-                                        listOldCmt?.add("Comments/"+ id)
-                                        songRef.update("comments",listOldCmt)
-                                            .addOnSuccessListener {
-                                                Toast.makeText(context,"Send comment successfully",Toast.LENGTH_SHORT).show()
-                                                edt_cmt.setText("")
 
-                                                song.comments   = listOldCmt
-                                                song.getCommentsUser()
-                                                    ?.let { it1 -> commentAdapter.setData(it1) }
-
-                                                commentAdapter.notifyDataSetChanged()
-
-                                                title.text = "Comment "+ "(" + listOldCmt?.size + ")"
-
-                                                this.dialog.HideDialog()
-
-                                            }
-                                            .addOnFailureListener{
-                                                Toast.makeText(context,"Send comment failed",Toast.LENGTH_SHORT).show()
-                                                this.dialog.HideDialog()
-                                            }
+                                    .addOnFailureListener{e ->
+                                        Toast.makeText(context,"Send comment failed",Toast.LENGTH_SHORT).show()
+                                        this.dialog.HideDialog()
                                     }
+                            }
 
 
-                                }
-
-                                .addOnFailureListener{e ->
-                                    Toast.makeText(context,"Send comment failed",Toast.LENGTH_SHORT).show()
-                                    this.dialog.HideDialog()
-                                }
                         }
                     }
                     .setNegativeButton("No") { dialog, id ->
