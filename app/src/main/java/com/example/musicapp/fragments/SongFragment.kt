@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.TextView
@@ -25,19 +25,21 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.musicapp.R
 import com.example.musicapp.adapters.CommentAdapter
 import com.example.musicapp.adapters.NewSongAdapter
-import com.example.musicapp.adapters.SingerAdapter
 import com.example.musicapp.adapters.TrackViewPagerAdapter
 import com.example.musicapp.dialog.LoadingDialog
 import com.example.musicapp.models.Comment
 import com.example.musicapp.models.Song
 import com.example.musicapp.services.PlayMusicService
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
+import com.google.firebase.storage.FirebaseStorage
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+
 
 class SongFragment(private val song: Song, private val songs: ArrayList<Song>): Fragment(R.layout.fragment_song){
 //    Recycler view
@@ -54,6 +56,8 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
     private lateinit var sbrMusic: SeekBar
 
     private lateinit var btnMenu : ImageButton
+
+    lateinit var storage: FirebaseStorage
 
 
     lateinit var dialog : LoadingDialog
@@ -83,6 +87,7 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
         dialog = LoadingDialog(requireActivity())
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
+        storage = FirebaseStorage.getInstance()
 
         val popupMenu = PopupMenu(context, btnMenu)
         popupMenu.inflate(R.menu.menu_song2)
@@ -100,6 +105,31 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
                         true
                     }
 
+                    R.id.itShare -> {
+
+                        val mp3Ref = storage.reference.child(song.link)
+
+//                        val linkMp3 = mp3Ref.downloadUrl.toString()
+//                        Toast.makeText(context,linkMp3,Toast.LENGTH_SHORT).show()
+
+                        val urlTask: Task<Uri> = mp3Ref.downloadUrl
+                        urlTask.addOnSuccessListener(OnSuccessListener<Uri> { uri ->
+                            val downloadUrl = uri.toString()
+//                            Toast.makeText(context,downloadUrl,Toast.LENGTH_SHORT).show()
+//                            Log.d("ddd",downloadUrl)
+                            val intent = Intent(Intent.ACTION_SEND)
+                            intent.type = "text/plain"
+                            intent.putExtra(Intent.EXTRA_TEXT, "Song: " +song.name + ", url: " + downloadUrl)
+                            intent.putExtra(Intent.EXTRA_TITLE, song.name)
+
+                            val chooser =  Intent.createChooser(intent, "Share using")
+                            startActivity(chooser)
+
+                        })
+
+
+                        true
+                    }
                     else -> false
                 }
             }
