@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/circleImageView"
+        android:layout_width="34dp"
+        android:layout_height="30dp"
+        android:layout_marginStart="40dp"
+        android:src="@drawable/alan_walker"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.297">
+
+    </de.hdodenhof.circleimageview.CircleImageView>
+
+    <TextView
+        android:id="@+id/usernameCmt"
+        android:layout_width="208dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="24dp"
+        android:text="abc129"
+        android:textSize="13dp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/circleImageView"
+        app:layout_constraintTop_toTopOf="@+id/circleImageView" />
+
+    <TextView
+        android:id="@+id/comment"
+        android:layout_width="291dp"
+        android:layout_height="33dp"
+        android:layout_marginTop="4dp"
+        android:text="Bai hat qua hay!"
+        android:textColor="@color/black"
+        android:textSize="13dp"
+        app:layout_constraintStart_toStartOf="@+id/usernameCmt"
+        app:layout_constraintTop_toBottomOf="@+id/usernameCmt" />
+
+    <TextView
+        android:id="@+id/dateCmt"
+        android:layout_width="225dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="8dp"
+        android:text="11:30:23 23/11/2023"
+        android:textColor="@color/black"
+        android:textSize="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/comment"
+        app:layout_constraintTop_toBottomOf="@+id/comment" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

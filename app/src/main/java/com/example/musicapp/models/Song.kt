@@ -2,30 +2,37 @@ package com.example.musicapp.models
 
 import android.graphics.drawable.Drawable
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 import java.io.Serializable
 import java.util.Date
 
-class Song (
+class Song  (
     var id: Long,
     var name: String,
+    var type: String,
     var lyric: String,
     var link: String,
     var postAt: String,
     var image: String,
     var artists: DocumentReference? = null,
     var isLoved: Boolean = false,
+    var comments: ArrayList<String>? = null
 ): Serializable{
 
-    constructor() :    this(0, "", "" , "","", "",null)
+    constructor() :    this(0, "","", "" , "","", "",null,false,null)
 
-//    fun getArtists(): String {
-//        if(artists.size > 2){
-//            return artists[0].name + " " + artists[1].name + " and others"
-//        }
-//        return artists[0].name + " " + artists[1].name
-//    }
-//
-//    override fun toString(): String {
-//        return "Song(id='$id', name='$name', lyric='$lyric', link='$link', postAt=$postAt, artists=$artists)"
-//    }
+    fun getCommentsUser(): ArrayList<DocumentReference>? {
+
+       val arr  = ArrayList<DocumentReference>()
+
+        if(comments!=null){
+            for(path in this.comments!!){
+                val docRef = FirebaseFirestore.getInstance().document(path)
+                arr.add(docRef)
+            }
+
+        }
+
+        return arr
+    }
 }

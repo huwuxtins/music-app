@@ -1,10 +1,12 @@
 package com.example.musicapp.models
 
-import java.util.Date
+import com.google.firebase.firestore.DocumentReference
 
 class Comment (
-    var user: User,
-    var song: Song,
-    var createAt: Date,
+    var id : String,
+    var user: DocumentReference ? = null,
+    var createAt: String,
     var content: String
-)
+){
+    constructor() : this("",null,"","")
+}

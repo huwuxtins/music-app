@@ -1,5 +1,6 @@
 package com.example.musicapp.fragments
 
+import android.app.AlertDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -9,21 +10,34 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.musicapp.R
+import com.example.musicapp.adapters.CommentAdapter
 import com.example.musicapp.adapters.NewSongAdapter
+import com.example.musicapp.adapters.SingerAdapter
 import com.example.musicapp.adapters.TrackViewPagerAdapter
+import com.example.musicapp.dialog.LoadingDialog
+import com.example.musicapp.models.Comment
 import com.example.musicapp.models.Song
 import com.example.musicapp.services.PlayMusicService
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class SongFragment(private val song: Song, private val songs: ArrayList<Song>): Fragment(R.layout.fragment_song){
 //    Recycler view
@@ -41,6 +55,15 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
 
     private lateinit var btnMenu : ImageButton
 
+
+    lateinit var dialog : LoadingDialog
+
+    lateinit var db : FirebaseFirestore
+
+    lateinit var auth : FirebaseAuth
+
+    lateinit var commentAdapter : CommentAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -57,6 +80,10 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
         tvEndTime = view.findViewById(R.id.tvEndTime)
         btnMenu = view.findViewById(R.id.btnMenuSong)
 
+        dialog = LoadingDialog(requireActivity())
+        db = FirebaseFirestore.getInstance()
+        auth = FirebaseAuth.getInstance()
+
         val popupMenu = PopupMenu(context, btnMenu)
         popupMenu.inflate(R.menu.menu_song2)
 
@@ -69,9 +96,7 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
                         showComment()
                         true
                     }
-
-                    R.id.itContact -> {
-
+                    R.id.itDownload -> {
                         true
                     }
 
@@ -171,9 +196,130 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
     fun showComment(){
         val bottomDialogComment = BottomSheetDialog(requireActivity(),R.style.CustomBottomSheetDialogTheme)
         val bottomCommentView =LayoutInflater.from(context).inflate(R.layout.layout_comment, view?.findViewById(R.id.commentContainer), false)
+        val listCmt = song.getCommentsUser()
+        if(listCmt != null ){
+            commentAdapter  = context?.let { CommentAdapter(it,listCmt) }!!
+            val recyclerView : RecyclerView = bottomCommentView.findViewById(R.id.listCmt)
+            val title : TextView = bottomCommentView.findViewById(R.id.textView11)
+            title.text = "Comment "+ "(" + listCmt.size + ")"
+            val layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            recyclerView.adapter = commentAdapter
+            recyclerView.layoutManager =  layoutManager
+            recyclerView.addItemDecoration(
+                DividerItemDecoration(
+                    context,
+                    layoutManager.orientation
+                )
+            )
+
+            val imgSend : ImageButton = bottomCommentView.findViewById(R.id.imageButton)
+            val edt_cmt : EditText = bottomCommentView.findViewById(R.id.edt_cmt)
+
+            imgSend.setOnClickListener{
+                val builder = AlertDialog.Builder(context)
+                builder.setMessage("Are you sure you want to send your comment?")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes") { dialog, id ->
+                        val content = edt_cmt.text.toString()
+                        if(content == ""){
+                            Toast.makeText(context,"Please enter your comment",Toast.LENGTH_SHORT).show()
+                        }
+                        else{
+
+                            this.dialog = LoadingDialog(requireActivity())
+
+                            this.dialog.ShowDialog("Send Comment")
+
+                            val docRefCmt = db.collection("Comments").document()
+                            val id = docRefCmt.id
+
+                            val fUser =auth.currentUser
+                            val email = fUser?.email.toString()
+
+                          //  Toast.makeText(context,id.toString(),Toast.LENGTH_SHORT).show()
+
+                            val userRef : DocumentReference = db.collection("Users").document(email)
+
+                            val formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy")
+                            val current = LocalDateTime.now().format(formatter)
 
 
-        bottomDialogComment.setContentView(bottomCommentView)
-        bottomDialogComment.show()
+                            val newComment = Comment(id.toString(),userRef,current,content) // tao comment moi
+
+                            db.collection("Comments").document(id).set(newComment)
+                                .addOnSuccessListener { doc ->
+                                    var listOldCmt  : ArrayList<String>? = song.comments
+                                    val songRef = db.collection("Songs").document(song.id.toString())
+
+                                    if(listOldCmt == null || listOldCmt.size == 0){
+                                        listOldCmt = ArrayList<String>()
+                                        listOldCmt?.add("Comments/"+ id)
+                                        song.comments = listOldCmt
+                                        songRef.set(song)
+                                            .addOnSuccessListener {
+                                                Toast.makeText(context,"Send comment successfully",Toast.LENGTH_SHORT).show()
+                                                edt_cmt.setText("")
+                                                song.getCommentsUser()
+                                                    ?.let { it1 -> commentAdapter.setData(it1) }
+
+                                                commentAdapter.notifyDataSetChanged()
+
+                                                title.text = "Comment "+ "(" + listOldCmt?.size + ")"
+
+                                                this.dialog.HideDialog()
+                                            }
+
+                                            .addOnFailureListener{
+                                                Toast.makeText(context,"Send comment failed",Toast.LENGTH_SHORT).show()
+                                                this.dialog.HideDialog()
+                                            }
+                                    }
+                                    else{
+                                        listOldCmt?.add("Comments/"+ id)
+                                        songRef.update("comments",listOldCmt)
+                                            .addOnSuccessListener {
+                                                Toast.makeText(context,"Send comment successfully",Toast.LENGTH_SHORT).show()
+                                                edt_cmt.setText("")
+
+                                                song.comments   = listOldCmt
+                                                song.getCommentsUser()
+                                                    ?.let { it1 -> commentAdapter.setData(it1) }
+
+                                                commentAdapter.notifyDataSetChanged()
+
+                                                title.text = "Comment "+ "(" + listOldCmt?.size + ")"
+
+                                                this.dialog.HideDialog()
+
+                                            }
+                                            .addOnFailureListener{
+                                                Toast.makeText(context,"Send comment failed",Toast.LENGTH_SHORT).show()
+                                                this.dialog.HideDialog()
+                                            }
+                                    }
+
+
+                                }
+
+                                .addOnFailureListener{e ->
+                                    Toast.makeText(context,"Send comment failed",Toast.LENGTH_SHORT).show()
+                                    this.dialog.HideDialog()
+                                }
+                        }
+                    }
+                    .setNegativeButton("No") { dialog, id ->
+                        dialog.dismiss()
+                    }
+                val alert = builder.create()
+                alert.show()
+            }
+
+
+            bottomDialogComment.setContentView(bottomCommentView)
+            bottomDialogComment.show()
+        }else{
+          //  Toast.makeText(context,"No comments yet", Toast.LENGTH_SHORT).show()
+        }
+
     }
 }
