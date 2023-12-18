@@ -29,29 +29,55 @@
 
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/vpSong"
-                android:layout_width="320dp"
-                android:layout_height="360dp"
+                android:layout_width="330dp"
+                android:layout_height="321dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+
+            <ImageButton
+                android:id="@+id/img_showCmt"
+                android:layout_width="45dp"
+                android:layout_height="38dp"
+                android:layout_marginBottom="10dp"
+                android:background="@null"
+                android:src="@drawable/commenticon"
+                app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+                app:layout_constraintEnd_toEndOf="@+id/vpSong"
+                app:layout_constraintTop_toBottomOf="@+id/vpSong"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <ImageButton
+                android:id="@+id/img_favorite"
+                android:layout_width="45dp"
+                android:layout_height="38dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/heart"
+                android:background="@null"
+                app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+                app:layout_constraintStart_toStartOf="@+id/vpSong"
+                app:layout_constraintTop_toBottomOf="@+id/vpSong" />
+
             <LinearLayout
+                android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center"
-                app:layout_constraintTop_toBottomOf="@+id/vpSong"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/vpSong"
                 app:layout_constraintVertical_bias="1">
+
                 <TextView
                     android:id="@+id/tvStartTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="00:00"
                     android:textColor="@color/text"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <SeekBar
                     android:id="@+id/sbrMusic"
@@ -66,7 +92,7 @@
                     android:layout_height="wrap_content"
                     android:text="00:00"
                     android:textColor="@color/text"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 

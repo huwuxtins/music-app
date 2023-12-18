@@ -55,6 +55,7 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
     private lateinit var btnPre: ImageButton
     private lateinit var btnRandom: ImageButton
     private lateinit var btnLoop: ImageButton
+    private lateinit var img_showCmt : ImageButton
 //    TextView
     private lateinit var tvStartTime: TextView
     private lateinit var tvEndTime: TextView
@@ -93,6 +94,7 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
         tvStartTime = view.findViewById(R.id.tvStartTime)
         tvEndTime = view.findViewById(R.id.tvEndTime)
         btnMenu = view.findViewById(R.id.btnMenuSong)
+        img_showCmt = view.findViewById(R.id.img_showCmt)
 
         dialog = LoadingDialog(requireActivity())
         db = FirebaseFirestore.getInstance()
@@ -102,15 +104,15 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
         val popupMenu = PopupMenu(context, btnMenu)
         popupMenu.inflate(R.menu.menu_song2)
 
+        img_showCmt.setOnClickListener {
+            showComment()
+        }
+
         btnMenu.setOnClickListener{
             popupMenu.show()
             popupMenu.setOnMenuItemClickListener {
                 // Handle menu item click here
                 when (it.itemId) {
-                    R.id.itComment -> {
-                        showComment()
-                        true
-                    }
                     R.id.itDownload -> {
                         true
                     }
@@ -118,15 +120,9 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
                     R.id.itShare -> {
 
                         val mp3Ref = storage.reference.child(song.link)
-
-//                        val linkMp3 = mp3Ref.downloadUrl.toString()
-//                        Toast.makeText(context,linkMp3,Toast.LENGTH_SHORT).show()
-
                         val urlTask: Task<Uri> = mp3Ref.downloadUrl
                         urlTask.addOnSuccessListener(OnSuccessListener<Uri> { uri ->
                             val downloadUrl = uri.toString()
-//                            Toast.makeText(context,downloadUrl,Toast.LENGTH_SHORT).show()
-//                            Log.d("ddd",downloadUrl)
                             val intent = Intent(Intent.ACTION_SEND)
                             intent.type = "text/plain"
                             intent.putExtra(Intent.EXTRA_TEXT, "Song: " +song.name + ", url: " + downloadUrl)
