@@ -57,6 +57,7 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
 
             val intent = Intent(mainActivity, PlayMusicService::class.java)
             intent.putExtra("song", song)
+            intent.putExtra("songs", songs)
             intent.action = "NEW_MUSIC_PLAY"
 
             if(songId == song.id){
@@ -65,7 +66,6 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
 
             imgSong.setOnClickListener{
                 mainActivity.loadFragment(songFragment, stackName)
-
                 mainActivity.startForegroundService(intent)
             }
             tvNameSong.setOnClickListener{

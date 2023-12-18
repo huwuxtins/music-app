@@ -3,6 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="background">#272727</color>
+    <color name="background_clicked">#D6D6D6</color>
     <color name="background_edit">#FFFFFF</color>
     <color name="text">#fff</color>
     <color name="backgroundButton">#0013BB</color>

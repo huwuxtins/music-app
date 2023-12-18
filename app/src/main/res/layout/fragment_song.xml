@@ -12,28 +12,26 @@
         android:background="@color/background"
         android:padding="15dp">
 
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <ImageButton
                 android:id="@+id/btnMenuSong"
-                android:layout_width="62dp"
-                android:layout_height="61dp"
-                android:layout_marginStart="1dp"
-
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:backgroundTint="@color/background"
                 android:src="@drawable/icon_menu"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/vpSong"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:elevation="2dp"/>
 
 
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/vpSong"
-                android:layout_width="316dp"
-                android:layout_height="358dp"
+                android:layout_width="320dp"
+                android:layout_height="360dp"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -42,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/vpSong"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -51,7 +49,7 @@
                     android:id="@+id/tvStartTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0:00"
+                    android:text="00:00"
                     android:textColor="@color/text"
                     android:textStyle="bold"/>
 
@@ -66,7 +64,7 @@
                     android:id="@+id/tvEndTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0:00"
+                    android:text="00:00"
                     android:textColor="@color/text"
                     android:textStyle="bold"/>
             </LinearLayout>

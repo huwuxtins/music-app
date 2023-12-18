@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.musicapp.R
+import com.example.musicapp.activities.MainActivity
 import com.example.musicapp.adapters.CommentAdapter
 import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.TrackViewPagerAdapter
@@ -41,7 +43,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
-class SongFragment(private val song: Song, private val songs: ArrayList<Song>): Fragment(R.layout.fragment_song){
+class SongFragment(private val song: Song, private var songs: ArrayList<Song>): Fragment(R.layout.fragment_song){
 //    Recycler view
     private lateinit var rcvSong: RecyclerView
 //    ViewPage
@@ -49,6 +51,10 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
 //    Button
     private lateinit var btnPlay: ImageButton
     private lateinit var btnPause: ImageButton
+    private lateinit var btnNext: ImageButton
+    private lateinit var btnPre: ImageButton
+    private lateinit var btnRandom: ImageButton
+    private lateinit var btnLoop: ImageButton
 //    TextView
     private lateinit var tvStartTime: TextView
     private lateinit var tvEndTime: TextView
@@ -79,6 +85,10 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
 
         btnPlay = view.findViewById(R.id.btnPlay)
         btnPause = view.findViewById(R.id.btnPause)
+        btnNext = view.findViewById(R.id.btnNext)
+        btnPre = view.findViewById(R.id.btnPre)
+        btnRandom = view.findViewById(R.id.btnRandom)
+        btnLoop = view.findViewById(R.id.btnLoop)
         sbrMusic = view.findViewById(R.id.sbrMusic)
         tvStartTime = view.findViewById(R.id.tvStartTime)
         tvEndTime = view.findViewById(R.id.tvEndTime)
@@ -136,9 +146,8 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
 
         }
 
-
+        val intent = Intent(activity, PlayMusicService::class.java)
         btnPlay.setOnClickListener{
-            val intent = Intent(activity, PlayMusicService::class.java)
             intent.putExtra("song", song)
             intent.action = "MUSIC_RESUME"
             btnPlay.visibility = View.INVISIBLE
@@ -148,12 +157,51 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
         }
 
         btnPause.setOnClickListener{
-            val intent = Intent(activity, PlayMusicService::class.java)
             intent.action = "MUSIC_PAUSE"
             btnPause.visibility = View.INVISIBLE
             btnPlay.visibility = View.VISIBLE
 
             activity?.startForegroundService(intent)
+        }
+
+        btnLoop.setOnClickListener{
+            intent.action = "MUSIC_LOOP"
+            Toast.makeText(context, "Looping...", Toast.LENGTH_LONG).show()
+            activity?.startForegroundService(intent)
+        }
+
+        val mainActivity = context as MainActivity
+
+        btnNext.setOnClickListener{
+            val positionOfCurrentSong = songs.indexOf(song)
+            var positionOfNextSong = 0
+            if(positionOfCurrentSong < songs.size - 1){
+                positionOfNextSong = positionOfCurrentSong + 1
+            }
+            intent.putExtra("song", songs[positionOfNextSong])
+            intent.action = "NEW_MUSIC_PLAY"
+            val songFragment = SongFragment(songs[positionOfNextSong], songs)
+            mainActivity.loadFragment(songFragment, "music")
+            mainActivity.startForegroundService(intent)
+        }
+
+        btnPre.setOnClickListener{
+            val positionOfCurrentSong = songs.indexOf(song)
+            var positionOfPreSong = 0
+            if(positionOfCurrentSong > 0){
+                positionOfPreSong = positionOfCurrentSong -1
+            }
+            intent.putExtra("song", songs[positionOfPreSong])
+            intent.action = "NEW_MUSIC_PLAY"
+            val songFragment = SongFragment(songs[positionOfPreSong], songs)
+            mainActivity.loadFragment(songFragment, "music")
+            mainActivity.startForegroundService(intent)
+        }
+
+        btnRandom.setOnClickListener{
+            songs = ArrayList(songs.shuffled())
+            rcvSong.adapter = context?.let { NewSongAdapter(it, songs, true) }
+            rcvSong.adapter?.notifyDataSetChanged()
         }
 
         val fragmentList = listOf(DetailSongFragment(song), TrackFragment(song), LyricsFragment(song))
@@ -194,26 +242,62 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
 
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (intent.action == "com.example.updateSeekBar") {
-                val currentPosition = intent.getIntExtra("currentPosition", 0)
-                val max = intent.getIntExtra("max", 0)
 
-                sbrMusic.max = max
-                sbrMusic.progress = currentPosition
+            val mainActivity = context as MainActivity
+            when (intent.action){
+                "com.example.UPDATE_SEEKBAR" -> {
+                    val currentPosition = intent.getIntExtra("currentPosition", 0)
+                    val max = intent.getIntExtra("max", 0)
+
+                    sbrMusic.max = max
+                    sbrMusic.progress = currentPosition
+                }
+                "com.example.PAUSE_MUSIC" -> {
+                    btnPause.visibility = View.INVISIBLE
+                    btnPlay.visibility = View.VISIBLE
+                }
+                "com.example.PLAY_MUSIC" -> {
+                    btnPlay.visibility = View.INVISIBLE
+                    btnPause.visibility = View.VISIBLE
+                }
+                "com.example.CHANGE_MUSIC" -> {
+                    val status = intent.getStringExtra("status")
+                    val positionOfCurrentSong = songs.indexOf(song)
+                    var position = 0
+                    if(status == "next"){
+                        if(positionOfCurrentSong < songs.size - 1){
+                            position = positionOfCurrentSong + 1
+                        }
+                    }
+                    else if(status == "pre"){
+                        if(positionOfCurrentSong > 0){
+                            position = positionOfCurrentSong - 1
+                        }
+                    }
+
+                    val musicIntent = Intent(activity, PlayMusicService::class.java)
+                    musicIntent.putExtra("song", songs[position])
+                    musicIntent.action = "NEW_MUSIC_PLAY"
+                    val songFragment = SongFragment(songs[position], songs)
+                    mainActivity.loadFragment(songFragment, "music")
+                    mainActivity.startForegroundService(musicIntent)
+                }
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        requireActivity().registerReceiver(receiver, IntentFilter("com.example.updateSeekBar"))
+        requireActivity().registerReceiver(receiver, IntentFilter("com.example.UPDATE_SEEKBAR"))
+        requireActivity().registerReceiver(receiver, IntentFilter("com.example.CHANGE_MUSIC"))
+        requireActivity().registerReceiver(receiver, IntentFilter("com.example.PAUSE_MUSIC"))
+        requireActivity().registerReceiver(receiver, IntentFilter("com.example.PLAY_MUSIC"))
     }
 
     override fun onPause() {
         super.onPause()
         requireActivity().unregisterReceiver(receiver)
     }
-
 
     fun convertToMinute(millisecond: Int): String {
         val second = millisecond / 1000
@@ -222,8 +306,7 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
         return String.format("%02d:%02d", m, s)
     }
 
-
-    fun showComment(){
+    private fun showComment(){
         val bottomDialogComment = BottomSheetDialog(requireActivity(),R.style.CustomBottomSheetDialogTheme)
         val bottomCommentView =LayoutInflater.from(context).inflate(R.layout.layout_comment, view?.findViewById(R.id.commentContainer), false)
         val listCmt = song.getCommentsUser()
@@ -268,8 +351,6 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
 
                                 val fUser =auth.currentUser
                                 val email = fUser?.email.toString()
-
-                                //  Toast.makeText(context,id.toString(),Toast.LENGTH_SHORT).show()
 
                                 val userRef : DocumentReference = db.collection("Users").document(email)
 
@@ -330,8 +411,6 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
                                                     this.dialog.HideDialog()
                                                 }
                                         }
-
-
                                     }
 
                                     .addOnFailureListener{e ->
@@ -339,8 +418,6 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
                                         this.dialog.HideDialog()
                                     }
                             }
-
-
                         }
                     }
                     .setNegativeButton("No") { dialog, id ->
@@ -349,7 +426,6 @@ class SongFragment(private val song: Song, private val songs: ArrayList<Song>): 
                 val alert = builder.create()
                 alert.show()
             }
-
 
             bottomDialogComment.setContentView(bottomCommentView)
             bottomDialogComment.show()

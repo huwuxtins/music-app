@@ -10,8 +10,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ServiceInfo
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.Drawable
 import android.media.AudioAttributes
 import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -21,9 +25,12 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 import com.example.musicapp.R
+import com.example.musicapp.activities.MainActivity
 import com.example.musicapp.models.Song
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.Target
 
 class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
@@ -35,7 +42,7 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     private val notificationId = 100
 
     private var song: Song? = null
-
+    private var songs: ArrayList<Song>? = null
 
     private val updateSeekBarRunnable: Runnable = object : Runnable {
         override fun run() {
@@ -43,7 +50,7 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                 try {
                     if (mediaPlayer.isPlaying) {
                         val currentPosition = mediaPlayer.currentPosition
-                        sendBroadcast(Intent("com.example.updateSeekBar")
+                        sendBroadcast(Intent("com.example.UPDATE_SEEKBAR")
                             .putExtra("currentPosition", currentPosition)
                             .putExtra("max", mediaPlayer.duration))
 
@@ -63,29 +70,110 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     private val receiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             Log.e("MyApp", "Intent's action: ${intent?.action}")
-            if(intent?.action == "UPDATE_MUSIC"){
-                val duration = intent.getIntExtra("currentDuration", 0)
-                saveLastPlayedPosition(duration)
-                mMediaPlayer?.seekTo(duration)
-            }
-            else if(intent?.action == "PAUSE_MUSIC"){
-                mMediaPlayer?.pause()
-                updateNotification(getNotification("STATUS_PAUSE"))
-            }
-            else if(intent?.action == "PLAY_MUSIC"){
-                mMediaPlayer?.start()
-                updateNotification(getNotification("STATUS_PLAY"))
+            when(intent?.action){
+                "UPDATE_MUSIC" -> {
+                    val duration = intent.getIntExtra("currentDuration", 0)
+                    saveLastPlayedPosition(duration)
+                    mMediaPlayer?.seekTo(duration)
+                }
+                "PAUSE_MUSIC" -> {
+                    mMediaPlayer?.pause()
+                    updateNotification(getNotification("STATUS_PAUSE"))
+                    sendBroadcast(Intent("com.example.PAUSE_MUSIC")
+                        .putExtra("status", "next"))
+                }
+                "PLAY_MUSIC" -> {
+                    mMediaPlayer?.start()
+                    updateNotification(getNotification("STATUS_PLAY"))
+                    sendBroadcast(Intent("com.example.PLAY_MUSIC")
+                        .putExtra("status", "next"))
+                }
+                "NEXT_MUSIC" ->{
+                    if(songs != null){
+                        val positionOfCurrentSong = songs!!.indexOf(song)
+                        var positionOfNextSong = 0
+                        if(positionOfCurrentSong < songs!!.size - 1){
+                            positionOfNextSong = positionOfCurrentSong + 1
+                        }
+                        song = songs!![positionOfNextSong]
+                        mMediaPlayer?.let { mediaPlayer ->
+                            if(mediaPlayer.isPlaying){
+                                mediaPlayer.release()
+                            }
+                        }
+                        saveLastPlayedPosition(0)
+                        val storage = FirebaseStorage.getInstance()
 
-            }
-            else if(intent?.action == "PREV_MUSIC"){
+                        val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                        sharedPreferences.edit().putLong("song_id", song!!.id).apply()
 
-            }
-            else if(intent?.action == "NEXT_MUSIC"){
+                        val storageRef: StorageReference = storage.reference.child(song!!.link)
 
-            }
-            else if(intent?.action == "CLOSE_MUSIC"){
-                stopForeground(STOP_FOREGROUND_REMOVE)
-                stopSelf()
+                        storageRef.downloadUrl.addOnSuccessListener { uri ->
+                            mMediaPlayer = MediaPlayer()
+                            mMediaPlayer?.apply {
+                                setAudioAttributes(
+                                    AudioAttributes.Builder()
+                                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                                        .build()
+                                )
+                                setDataSource(applicationContext, uri)
+                                setOnPreparedListener(this@PlayMusicService)
+                                prepareAsync()
+
+                            }
+                        }
+                    }
+                    updateNotification(getNotification("STATUS_PLAY"))
+                    sendBroadcast(Intent("com.example.CHANGE_MUSIC")
+                        .putExtra("status", "next"))
+                }
+                "PRE_MUSIC" -> {
+                    if(songs != null){
+                        val positionOfCurrentSong = songs!!.indexOf(song)
+                        var positionOfPreSong = 0
+                        if(positionOfCurrentSong > 0){
+                            positionOfPreSong = positionOfCurrentSong -1
+                        }
+                        song = songs!![positionOfPreSong]
+                        mMediaPlayer?.let { mediaPlayer ->
+                            if(mediaPlayer.isPlaying){
+                                mediaPlayer.release()
+                            }
+                        }
+                        saveLastPlayedPosition(0)
+                        val storage = FirebaseStorage.getInstance()
+
+                        val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                        sharedPreferences.edit().putLong("song_id", song!!.id).apply()
+
+                        val storageRef: StorageReference = storage.reference.child(song!!.link)
+
+                        storageRef.downloadUrl.addOnSuccessListener { uri ->
+                            mMediaPlayer = MediaPlayer()
+                            mMediaPlayer?.apply {
+                                setAudioAttributes(
+                                    AudioAttributes.Builder()
+                                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                                        .build()
+                                )
+                                setDataSource(applicationContext, uri)
+                                setOnPreparedListener(this@PlayMusicService)
+                                prepareAsync()
+
+                            }
+                        }
+                    }
+                    updateNotification(getNotification("STATUS_PLAY"))
+                    sendBroadcast(Intent("com.example.CHANGE_MUSIC")
+                        .putExtra("status", "pre"))
+                }
+                "CLOSE_MUSIC" -> {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                    stopSelf()
+                }
             }
         }
     }
@@ -94,6 +182,7 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         song = intent?.extras?.getSerializable("song") as? Song
+        songs = intent?.extras?.getSerializable("songs") as? ArrayList<Song>
 
         val notification = getNotification("STATUS_PLAY")
 
@@ -111,14 +200,12 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                 updateNotification(getNotification("STATUS_PAUSE"))
                 return START_STICKY
             }
-
             "MUSIC_RESUME" -> {
                 mMediaPlayer?.start()
                 Log.e("MyApp", "MUSIC_RESUME")
                 updateNotification(getNotification("STATUS_PLAY"))
                 return START_STICKY
             }
-
             "MUSIC_PLAY", "NEW_MUSIC_PLAY" -> {
                 mMediaPlayer?.let { mediaPlayer ->
                     if(mediaPlayer.isPlaying){
@@ -153,6 +240,10 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                     }
                 }
             }
+            "MUSIC_LOOP" -> {
+                mMediaPlayer?.isLooping = true
+                Log.e("MyApp", "The end of the song: ${mMediaPlayer?.isLooping}")
+            }
 
             "MUSIC_DESTROY" -> {
                 stopForeground(STOP_FOREGROUND_REMOVE)
@@ -169,21 +260,32 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
         val lastPlayedPosition = getLastPlayedPosition()
         mediaPlayer.seekTo(lastPlayedPosition)
 
+        mediaPlayer.setOnCompletionListener {
+            if(it.isLooping){
+                it.start()
+            }
+        }
+
         handler = Handler()
         handler?.post(updateSeekBarRunnable)
 
         val updateFilter = IntentFilter("UPDATE_MUSIC")
         registerReceiver(receiver, updateFilter)
+        val homeFilter = IntentFilter("HOME_MUSIC")
+        registerReceiver(receiver, homeFilter)
         val pauseFilter = IntentFilter("PAUSE_MUSIC")
         registerReceiver(receiver, pauseFilter)
         val playFilter = IntentFilter("PLAY_MUSIC")
         registerReceiver(receiver, playFilter)
+        val nextFilter = IntentFilter("NEXT_MUSIC")
+        registerReceiver(receiver, nextFilter)
+        val preFilter = IntentFilter("PRE_MUSIC")
+        registerReceiver(receiver, preFilter)
         val closeFilter = IntentFilter("CLOSE_MUSIC")
         registerReceiver(receiver, closeFilter)
     }
 
     private fun updateNotification(notification: Notification) {
-        Log.e("MyApp", "Updating notification")
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.notify(notificationId, notification)
     }
@@ -216,6 +318,14 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
     fun getNotification(status: String): Notification{
         val mediaSessionCompat = MediaSessionCompat(this, "tag")
 
+        val homeIntent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        homeIntent.action = "HOME_MUSIC"
+        homeIntent.putExtra("song", song)
+        homeIntent.putExtra("songs", songs)
+        val pendingIntentHome = PendingIntent.getActivity(this, 12345, homeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
         val pauseIntent = Intent()
         pauseIntent.action = "PAUSE_MUSIC"
         val pendingIntentPause = PendingIntent.getBroadcast(this, 12345, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT)
@@ -224,19 +334,29 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
         playIntent.action = "PLAY_MUSIC"
         val pendingIntentPlay = PendingIntent.getBroadcast(this, 12345, playIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
+        val nextIntent = Intent()
+        nextIntent.action = "NEXT_MUSIC"
+        val pendingIntentNext = PendingIntent.getBroadcast(this, 12345, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val preIntent = Intent()
+        preIntent.action = "PRE_MUSIC"
+        val pendingIntentPre = PendingIntent.getBroadcast(this, 12345, preIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
         val closeIntent = Intent()
         closeIntent.action = "CLOSE_MUSIC"
         val pendingIntentClose = PendingIntent.getBroadcast(this, 12345, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         if(status == "STATUS_PLAY"){
+
             return  NotificationCompat.Builder(this, channelId)
                 // Show controls on lock screen even when user hides sensitive content.
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.logo_music_app)
+                .setContentIntent(pendingIntentHome)
                 // Add media control buttons that invoke intents in your media service
-                .addAction(R.drawable.icon_pre, "Previous", null) // #0
+                .addAction(R.drawable.icon_pre, "Previous", pendingIntentPre) // #0
                 .addAction(R.drawable.icon_pause, "Pause", pendingIntentPause) // #1
-                .addAction(R.drawable.icon_next, "Next", null) // #2
+                .addAction(R.drawable.icon_next, "Next", pendingIntentNext) // #2
                 .addAction(R.drawable.icon_close, "Close", pendingIntentClose) //  #3
                 // Apply the media style template.
                 .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
@@ -249,10 +369,11 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
             // Show controls on lock screen even when user hides sensitive content.
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSmallIcon(R.drawable.logo_music_app)
+            .setContentIntent(pendingIntentHome)
             // Add media control buttons that invoke intents in your media service
-            .addAction(R.drawable.icon_pre, "Previous", null) // #0
+            .addAction(R.drawable.icon_pre, "Previous", pendingIntentPre) // #0
             .addAction(R.drawable.icon_play, "Play", pendingIntentPlay) // #1
-            .addAction(R.drawable.icon_next, "Next", null) // #2
+            .addAction(R.drawable.icon_next, "Next", pendingIntentNext) // #2
             .addAction(R.drawable.icon_close, "Close", pendingIntentClose) // #3
             // Apply the media style template.
             .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
