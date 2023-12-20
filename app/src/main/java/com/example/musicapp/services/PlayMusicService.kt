@@ -11,7 +11,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.media.AudioAttributes
 import android.media.MediaPlayer
@@ -31,6 +30,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import java.io.File
 
 class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
@@ -43,6 +43,7 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
     private var song: Song? = null
     private var songs: ArrayList<Song>? = null
+    val storage = FirebaseStorage.getInstance()
 
     private val updateSeekBarRunnable: Runnable = object : Runnable {
         override fun run() {
@@ -78,13 +79,13 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                 }
                 "PAUSE_MUSIC" -> {
                     mMediaPlayer?.pause()
-                    updateNotification(getNotification("STATUS_PAUSE"))
+                    getNotification("STATUS_PAUSE", null)
                     sendBroadcast(Intent("com.example.PAUSE_MUSIC")
                         .putExtra("status", "next"))
                 }
                 "PLAY_MUSIC" -> {
                     mMediaPlayer?.start()
-                    updateNotification(getNotification("STATUS_PLAY"))
+                    getNotification("STATUS_PLAY", null)
                     sendBroadcast(Intent("com.example.PLAY_MUSIC")
                         .putExtra("status", "next"))
                 }
@@ -102,30 +103,13 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                             }
                         }
                         saveLastPlayedPosition(0)
-                        val storage = FirebaseStorage.getInstance()
 
                         val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
                         sharedPreferences.edit().putLong("song_id", song!!.id).apply()
 
-                        val storageRef: StorageReference = storage.reference.child(song!!.link)
-
-                        storageRef.downloadUrl.addOnSuccessListener { uri ->
-                            mMediaPlayer = MediaPlayer()
-                            mMediaPlayer?.apply {
-                                setAudioAttributes(
-                                    AudioAttributes.Builder()
-                                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                                        .build()
-                                )
-                                setDataSource(applicationContext, uri)
-                                setOnPreparedListener(this@PlayMusicService)
-                                prepareAsync()
-
-                            }
-                        }
+                        playMusic(song!!)
                     }
-                    updateNotification(getNotification("STATUS_PLAY"))
+                    getNotification("STATUS_PLAY", null)
                     sendBroadcast(Intent("com.example.CHANGE_MUSIC")
                         .putExtra("status", "next"))
                 }
@@ -143,34 +127,19 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                             }
                         }
                         saveLastPlayedPosition(0)
-                        val storage = FirebaseStorage.getInstance()
 
                         val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
                         sharedPreferences.edit().putLong("song_id", song!!.id).apply()
 
-                        val storageRef: StorageReference = storage.reference.child(song!!.link)
-
-                        storageRef.downloadUrl.addOnSuccessListener { uri ->
-                            mMediaPlayer = MediaPlayer()
-                            mMediaPlayer?.apply {
-                                setAudioAttributes(
-                                    AudioAttributes.Builder()
-                                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                                        .build()
-                                )
-                                setDataSource(applicationContext, uri)
-                                setOnPreparedListener(this@PlayMusicService)
-                                prepareAsync()
-
-                            }
-                        }
+                        playMusic(song!!)
                     }
-                    updateNotification(getNotification("STATUS_PLAY"))
+                    getNotification("STATUS_PLAY", null)
                     sendBroadcast(Intent("com.example.CHANGE_MUSIC")
                         .putExtra("status", "pre"))
                 }
                 "CLOSE_MUSIC" -> {
+                    val sharedPreferences = this@PlayMusicService.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().remove("song_id").apply()
                     stopForeground(STOP_FOREGROUND_REMOVE)
                     stopSelf()
                 }
@@ -183,9 +152,6 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
         song = intent?.extras?.getSerializable("song") as? Song
         songs = intent?.extras?.getSerializable("songs") as? ArrayList<Song>
-
-        val notification = getNotification("STATUS_PLAY")
-
         val channel = NotificationChannel(
             channelId,
             "Music Channel",
@@ -197,16 +163,17 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
         when(intent?.action) {
             "MUSIC_PAUSE" -> {
                 mMediaPlayer?.pause()
-                updateNotification(getNotification("STATUS_PAUSE"))
+                getNotification("STATUS_PAUSE", null)
                 return START_STICKY
             }
             "MUSIC_RESUME" -> {
                 mMediaPlayer?.start()
                 Log.e("MyApp", "MUSIC_RESUME")
-                updateNotification(getNotification("STATUS_PLAY"))
+                getNotification("STATUS_PLAY", null)
                 return START_STICKY
             }
             "MUSIC_PLAY", "NEW_MUSIC_PLAY" -> {
+                Log.e("MyApp", "Media player is playing")
                 mMediaPlayer?.let { mediaPlayer ->
                     if(mediaPlayer.isPlaying){
                         mediaPlayer.release()
@@ -216,28 +183,10 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                     if(intent.action == "NEW_MUSIC_PLAY"){
                         saveLastPlayedPosition(0)
                     }
-                    val storage = FirebaseStorage.getInstance()
-
                     val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
                     sharedPreferences.edit().putLong("song_id", song!!.id).apply()
 
-                    val storageRef: StorageReference = storage.reference.child(song!!.link)
-
-                    storageRef.downloadUrl.addOnSuccessListener { uri ->
-                        mMediaPlayer = MediaPlayer()
-                        mMediaPlayer?.apply {
-                            setAudioAttributes(
-                                AudioAttributes.Builder()
-                                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                                    .setUsage(AudioAttributes.USAGE_MEDIA)
-                                    .build()
-                            )
-                            setDataSource(applicationContext, uri)
-                            setOnPreparedListener(this@PlayMusicService)
-                            prepareAsync()
-
-                        }
-                    }
+                    playMusic(song!!)
                 }
             }
             "MUSIC_LOOP" -> {
@@ -251,7 +200,15 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
             }
         }
 
-        ServiceCompat.startForeground(this, notificationId, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK)
+        getNotification("STATUS_PLAY") {
+            ServiceCompat.startForeground(
+                this,
+                notificationId,
+                it,
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+            )
+        }
+
         return START_STICKY
     }
 
@@ -263,6 +220,11 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
         mediaPlayer.setOnCompletionListener {
             if(it.isLooping){
                 it.start()
+            }
+            else{
+                getNotification("STATUS_PLAY", null)
+                sendBroadcast(Intent("com.example.CHANGE_MUSIC")
+                    .putExtra("status", "next"))
             }
         }
 
@@ -285,9 +247,42 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
         registerReceiver(receiver, closeFilter)
     }
 
-    private fun updateNotification(notification: Notification) {
-        val notificationManager = getSystemService(NotificationManager::class.java)
-        notificationManager.notify(notificationId, notification)
+    private fun playMusic(song: Song){
+        if(song.isDownloaded){
+            mMediaPlayer = MediaPlayer()
+            mMediaPlayer?.apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+                Log.e("MyApp", "File's name: ${File(song.link).name}")
+                setDataSource(this@PlayMusicService, Uri.fromFile(File(song.link)))
+                setOnPreparedListener(this@PlayMusicService)
+                prepareAsync()
+
+            }
+        }
+        else{
+            val storageRef: StorageReference = storage.reference.child(song.link)
+
+            storageRef.downloadUrl.addOnSuccessListener { uri ->
+                mMediaPlayer = MediaPlayer()
+                mMediaPlayer?.apply {
+                    setAudioAttributes(
+                        AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .build()
+                    )
+                    setDataSource(this@PlayMusicService, uri)
+                    setOnPreparedListener(this@PlayMusicService)
+                    prepareAsync()
+
+                }
+            }
+        }
     }
 
     private fun saveLastPlayedPosition(position: Int) {
@@ -308,14 +303,13 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
     override fun onCompletion(mediaPlayer: MediaPlayer) {
         handler?.removeCallbacks(updateSeekBarRunnable)
-        // ... (existing code)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
         TODO("Not yet implemented")
     }
 
-    fun getNotification(status: String): Notification{
+    fun getNotification(status: String, onComplete: ((Notification) -> Unit)?){
         val mediaSessionCompat = MediaSessionCompat(this, "tag")
 
         val homeIntent = Intent(this, MainActivity::class.java).apply {
@@ -346,40 +340,61 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
         closeIntent.action = "CLOSE_MUSIC"
         val pendingIntentClose = PendingIntent.getBroadcast(this, 12345, closeIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-        if(status == "STATUS_PLAY"){
-
-            return  NotificationCompat.Builder(this, channelId)
-                // Show controls on lock screen even when user hides sensitive content.
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setSmallIcon(R.drawable.logo_music_app)
-                .setContentIntent(pendingIntentHome)
-                // Add media control buttons that invoke intents in your media service
-                .addAction(R.drawable.icon_pre, "Previous", pendingIntentPre) // #0
-                .addAction(R.drawable.icon_pause, "Pause", pendingIntentPause) // #1
-                .addAction(R.drawable.icon_next, "Next", pendingIntentNext) // #2
-                .addAction(R.drawable.icon_close, "Close", pendingIntentClose) //  #3
-                // Apply the media style template.
-                .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
-                    .setShowActionsInCompactView(1 /* #1: pause button \*/)
-                    .setMediaSession(mediaSessionCompat.sessionToken))
-                .setContentTitle(song?.name)
-                .build()
-        }
-        return NotificationCompat.Builder(this, channelId)
-            // Show controls on lock screen even when user hides sensitive content.
+        val notification = NotificationCompat.Builder(this, channelId)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setSmallIcon(R.drawable.logo_music_app)
             .setContentIntent(pendingIntentHome)
-            // Add media control buttons that invoke intents in your media service
-            .addAction(R.drawable.icon_pre, "Previous", pendingIntentPre) // #0
-            .addAction(R.drawable.icon_play, "Play", pendingIntentPlay) // #1
-            .addAction(R.drawable.icon_next, "Next", pendingIntentNext) // #2
-            .addAction(R.drawable.icon_close, "Close", pendingIntentClose) // #3
             // Apply the media style template.
             .setStyle(androidx.media.app.NotificationCompat.MediaStyle()
                 .setShowActionsInCompactView(1 /* #1: pause button \*/)
                 .setMediaSession(mediaSessionCompat.sessionToken))
             .setContentTitle(song?.name)
-            .build()
+            .addAction(R.drawable.icon_pre, "Previous", pendingIntentPre) // #0
+        if(status == "STATUS_PLAY"){
+
+            notification
+                .addAction(R.drawable.icon_pause, "Pause", pendingIntentPause) // #1
+        }
+        else{
+            notification
+                .addAction(R.drawable.icon_play, "Play", pendingIntentPlay) // #1
+        }
+        if(song != null){
+            if(!song?.isDownloaded!!){
+
+                Picasso.get().load(song?.image).into(object: Target {
+                    override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+
+                        val notificationManager = getSystemService(NotificationManager::class.java)
+                        val notificationBuilder = notification
+                            .addAction(R.drawable.icon_next, "Next", pendingIntentNext) // #2
+                            .addAction(R.drawable.icon_close, "Close", pendingIntentClose) //  #3
+                            .setLargeIcon(bitmap).build()
+                        notificationManager.notify(notificationId, notificationBuilder)
+                        if (onComplete != null) {
+                            onComplete(notificationBuilder)
+                        }
+                    }
+
+                    override fun onBitmapFailed(e: java.lang.Exception?, errorDrawable: Drawable?) {
+                    }
+
+                    override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+                    }
+
+                })
+            }
+            else{
+                val notificationManager = getSystemService(NotificationManager::class.java)
+                val notificationBuilder = notification
+                    .addAction(R.drawable.icon_next, "Next", pendingIntentNext) // #2
+                    .addAction(R.drawable.icon_close, "Close", pendingIntentClose) //  #3
+                    .build()
+                notificationManager.notify(notificationId, notificationBuilder)
+                if (onComplete != null) {
+                    onComplete(notificationBuilder)
+                }
+            }
+        }
     }
 }

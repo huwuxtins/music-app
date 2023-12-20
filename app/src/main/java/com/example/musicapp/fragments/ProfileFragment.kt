@@ -92,7 +92,7 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
         return view
     }
 
-    fun getInformation(){
+    private fun getInformation(){
         val fUser = auth.currentUser
         val email = fUser?.email.toString()
 

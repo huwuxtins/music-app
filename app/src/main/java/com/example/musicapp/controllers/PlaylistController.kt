@@ -1,22 +1,23 @@
 package com.example.musicapp.controllers
 
 import android.util.Log
-import android.widget.Toast
+import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Playlist
 import com.example.musicapp.models.Song
-import com.google.android.gms.tasks.OnFailureListener
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 
 class PlaylistController {
     private val db = Firebase.firestore
 
-    fun getAllPlaylist(onComplete: (ArrayList<Playlist>) -> Unit){
+    fun getAllPlaylist(userId: String, onComplete: (ArrayList<Playlist>) -> Unit){
         val playlists = ArrayList<Playlist>()
 
         db.collection("Playlists")
+            .whereEqualTo("userId", userId)
             .whereNotEqualTo("name", "Lovely")
             .get()
             .addOnSuccessListener { result ->
@@ -29,9 +30,21 @@ class PlaylistController {
                                 .addOnSuccessListener { songDocument ->
                                     val song  = songDocument.toObject(Song::class.java)
                                     if (song != null) {
-                                        playlist.songs.add(song)
+
+                                        val firestore = FirebaseFirestore.getInstance()
+                                        val docRef : DocumentReference = firestore.document(song.artist)
+
+                                        docRef.addSnapshotListener { value, error ->
+                                            if (value!=null){
+                                                val artist = value.toObject(Artist::class.java)
+                                                song.artistName = artist?.name.toString()
+                                                playlist.songs.add(song)
+                                                onComplete(playlists)
+                                            }else{
+                                                throw Error(error?.message ?: error.toString())
+                                            }
+                                        }
                                     }
-                                    onComplete(playlists)
                                 }
                                 .addOnFailureListener { exception ->
                                     Log.e("MyApp", "Can't load sons of playlist, error: $exception")
@@ -47,9 +60,9 @@ class PlaylistController {
             }
     }
 
-    fun getPlaylistByName(nameOfPlaylist: String, onComplete: (Playlist) -> Unit){
+    fun getPlaylistByName(userId: String, nameOfPlaylist: String, onComplete: (Playlist) -> Unit){
         db.collection("Playlists")
-            .document(nameOfPlaylist)
+            .document(nameOfPlaylist+"_$userId")
             .get()
             .addOnSuccessListener { result ->
                 val playlist = result.toObject(Playlist::class.java)
@@ -63,9 +76,21 @@ class PlaylistController {
                                         if(nameOfPlaylist == "Lovely"){
                                             song.isLoved = true
                                         }
-                                        playlist.songs.add(song)
+
+                                        val firestore = FirebaseFirestore.getInstance()
+                                        val docRef : DocumentReference = firestore.document(song.artist)
+
+                                        docRef.addSnapshotListener { value, error ->
+                                            if (value!=null){
+                                                val artist = value.toObject(Artist::class.java)
+                                                song.artistName = artist?.name.toString()
+                                                playlist.songs.add(song)
+                                                onComplete(playlist)
+                                            }else{
+                                                throw Error(error?.message ?: error.toString())
+                                            }
+                                        }
                                     }
-                                    onComplete(playlist)
                                 }
                                 .addOnFailureListener { exception ->
                                     Log.e("MyApp", "Can't load sons of playlist, error: $exception")
@@ -78,14 +103,29 @@ class PlaylistController {
     }
 
     fun addPlaylist(playlist: Playlist, onComplete: () -> Unit, onFail: () -> Unit){
-        db.collection("Playlists")
-            .document(playlist.name)
-            .set(playlist.toMap())
-            .addOnSuccessListener {
-                onComplete()
-            }
-            .addOnFailureListener {
-                onFail()
+        val playlistReference = db.collection("Playlists").document(playlist.name+"_${playlist.userId}")
+
+        playlistReference.get()
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val document = task.result
+                    if (document != null && document.exists()) {
+                        onFail()
+                    } else {
+                        db.collection("Playlists")
+                            .document(playlist.name+"_${playlist.userId}")
+                            .set(playlist.toMap())
+                            .addOnSuccessListener {
+                                onComplete()
+                            }
+                            .addOnFailureListener {
+                                onFail()
+                            }
+                    }
+                } else {
+                    // An error occurred while checking for the document
+                    onFail()
+                }
             }
     }
 

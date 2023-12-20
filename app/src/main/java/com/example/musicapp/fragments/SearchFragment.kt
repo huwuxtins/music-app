@@ -1,13 +1,7 @@
 package com.example.musicapp.fragments
 
-import android.app.SearchManager
-import android.content.Intent
-import android.content.SearchRecentSuggestionsProvider
 import android.os.Bundle
-import android.provider.SearchRecentSuggestions
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -20,38 +14,32 @@ import com.example.musicapp.R
 import com.example.musicapp.adapters.AlbumAdapter
 import com.example.musicapp.adapters.ArtistsSearchAdapter
 import com.example.musicapp.adapters.NewSongAdapter
-import com.example.musicapp.adapters.SingerAdapter
 import com.example.musicapp.models.Album
 import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Song
-import com.example.musicapp.others.MySuggestionProvider
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
 
+class SearchFragment: Fragment(R.layout.fragment_search) {
 
-class SearchFragment(): Fragment(R.layout.fragment_search) {
-
-    lateinit var searchView : SearchView
+    private lateinit var searchView : SearchView
     lateinit var searchSong : Button
     lateinit var searchArtist : Button
     lateinit var searchAlbum : Button
-    lateinit var recyclerView: RecyclerView
-    lateinit var listSong : ArrayList<Song>
-    lateinit var listArtist : ArrayList<Artist>
-    lateinit var listAlbum : ArrayList<Album>
-    lateinit var singerAdapter: ArtistsSearchAdapter
-    lateinit var songAdapter: NewSongAdapter
-    lateinit var albumAdapter : AlbumAdapter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var listSong : ArrayList<Song>
+    private lateinit var listArtist : ArrayList<Artist>
+    private lateinit var listAlbum : ArrayList<Album>
+    private lateinit var singerAdapter: ArtistsSearchAdapter
+    private lateinit var songAdapter: NewSongAdapter
+    private lateinit var albumAdapter : AlbumAdapter
     lateinit var key : String
     lateinit var db: FirebaseFirestore
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-
-
     ): View? {
         val view = inflater.inflate(R.layout.fragment_search, container, false)
         searchView = view.findViewById(R.id.edt_search)
@@ -71,9 +59,9 @@ class SearchFragment(): Fragment(R.layout.fragment_search) {
         listAlbum = ArrayList()
         listArtist = ArrayList()
 
-        songAdapter = activity?.let { NewSongAdapter(it.applicationContext,listSong, false) }!!
-        singerAdapter = activity?.let { ArtistsSearchAdapter(it.applicationContext,listArtist) }!!
-        albumAdapter = activity?.let { AlbumAdapter(it.applicationContext,listAlbum) }!!
+        songAdapter = activity?.let { NewSongAdapter(view.context,listSong, false) }!!
+        singerAdapter = activity?.let { ArtistsSearchAdapter(view.context,listArtist) }!!
+        albumAdapter = activity?.let { AlbumAdapter(view.context,listAlbum) }!!
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
@@ -102,17 +90,30 @@ class SearchFragment(): Fragment(R.layout.fragment_search) {
                 .addOnSuccessListener { result ->
                     for (document in result) {
                         val song = document.toObject(Song::class.java)
-                        if(song.name.contains(key)){
-                            listSong.add(song)
+
+                        val firestore = FirebaseFirestore.getInstance()
+                        val docRef : DocumentReference = firestore.document(song.artist)
+
+                        docRef.addSnapshotListener { value, error ->
+                            if (value!=null){
+                                val artist = value.toObject(Artist::class.java)
+                                song.artistName = artist?.name.toString()
+
+                                if(song.name.contains(key)){
+                                    listSong.add(song)
+                                }
+                                songAdapter.setData(listSong)
+                                recyclerView.adapter = songAdapter
+                                recyclerView!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+                                songAdapter.notifyDataSetChanged()
+                            }else{
+                                throw Error(error?.message ?: error.toString())
+                            }
                         }
                     }
-                    songAdapter.setData(listSong)
-                    recyclerView.adapter = songAdapter
-                    recyclerView!!.layoutManager = LinearLayoutManager(requireActivity().applicationContext, LinearLayoutManager.VERTICAL, false)
-                    songAdapter.notifyDataSetChanged()
                 }
 
-                .addOnFailureListener{ exception ->
+                .addOnFailureListener{
                     Toast.makeText(activity,"Error system",Toast.LENGTH_SHORT).show()
                 }
         }
@@ -132,16 +133,14 @@ class SearchFragment(): Fragment(R.layout.fragment_search) {
                     }
                     singerAdapter.setData(listArtist)
                     recyclerView.adapter = singerAdapter
-                    recyclerView!!.layoutManager = LinearLayoutManager(requireActivity().applicationContext, LinearLayoutManager.VERTICAL, false)
+                    recyclerView!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
                     singerAdapter.notifyDataSetChanged()
                 }
 
-                .addOnFailureListener{ exception ->
+                .addOnFailureListener{
                     Toast.makeText(activity,"Error system",Toast.LENGTH_SHORT).show()
                 }
-
         }
-
 
         searchAlbum.setOnClickListener{
             setColor(searchAlbum,searchSong,searchArtist)
@@ -159,19 +158,17 @@ class SearchFragment(): Fragment(R.layout.fragment_search) {
                     }
                     albumAdapter.setData(listAlbum)
                     recyclerView.adapter = albumAdapter
-                    recyclerView!!.layoutManager = LinearLayoutManager(requireActivity().applicationContext, LinearLayoutManager.VERTICAL, false)
+                    recyclerView!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
                     albumAdapter.notifyDataSetChanged()
                 }
 
-                .addOnFailureListener{ exception ->
+                .addOnFailureListener{
                     Toast.makeText(activity,"Error system",Toast.LENGTH_SHORT).show()
                 }
         }
 
         return view
     }
-
-
 
     private fun setColor(btn1 : Button, btn2 : Button, btn3: Button){
         btn1.setBackgroundColor(resources.getColor(R.color.selected))

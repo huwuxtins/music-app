@@ -1,10 +1,8 @@
 package com.example.musicapp.models
 
-import android.graphics.drawable.Drawable
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import java.io.Serializable
-import java.util.Date
 
 class Song  (
     var id: Long,
@@ -14,12 +12,14 @@ class Song  (
     var link: String,
     var postAt: String,
     var image: String,
-    var artists: DocumentReference? = null,
+    var artist: String,
+    var artistName: String,
     var isLoved: Boolean = false,
+    var isDownloaded: Boolean = false,
     var comments: ArrayList<String>? = null
 ): Serializable{
 
-    constructor() :    this(0, "","", "" , "","", "",null,false,null)
+    constructor() :    this(0, "","", "" , "","", "", "","", false, false, null)
 
     fun getCommentsUser(): ArrayList<DocumentReference>? {
 

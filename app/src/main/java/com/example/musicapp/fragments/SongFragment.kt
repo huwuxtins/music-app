@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -64,8 +63,7 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
 
     private lateinit var btnMenu : ImageButton
 
-    lateinit var storage: FirebaseStorage
-
+    private lateinit var storage: FirebaseStorage
 
     lateinit var dialog : LoadingDialog
 
@@ -73,7 +71,7 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
 
     lateinit var auth : FirebaseAuth
 
-    lateinit var commentAdapter : CommentAdapter
+    private lateinit var commentAdapter : CommentAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -345,7 +343,7 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
                                 val docRefCmt = db.collection("Comments").document()
                                 val id = docRefCmt.id
 
-                                val fUser =auth.currentUser
+                                val fUser = auth.currentUser
                                 val email = fUser?.email.toString()
 
                                 val userRef : DocumentReference = db.collection("Users").document(email)

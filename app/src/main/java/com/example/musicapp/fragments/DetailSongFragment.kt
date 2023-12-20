@@ -8,7 +8,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.musicapp.R
+import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Song
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 
 class DetailSongFragment(private val song: Song): Fragment(R.layout.fragment_detail_song)  {
@@ -27,7 +30,22 @@ class DetailSongFragment(private val song: Song): Fragment(R.layout.fragment_det
 
         tvNameSong.text = song.name
 
-        Picasso.get().load(song.image).into(imgSong);
+        val firestore = FirebaseFirestore.getInstance()
+        val docRef : DocumentReference = firestore.document(song.artist)
+
+        docRef.addSnapshotListener { value, error ->
+            if (value!=null){
+                val artist = value.toObject(Artist::class.java)
+                tvNameArtists.text = artist?.name
+            }else{
+                throw Error(error?.message ?: error.toString())
+            }
+        }
+//        tvNameArtists = view.
+
+        if(!song.isDownloaded){
+            Picasso.get().load(song.image).into(imgSong)
+        }
         return view
     }
 }

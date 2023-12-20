@@ -20,11 +20,14 @@ import com.example.musicapp.controllers.PlaylistController
 import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Playlist
 import com.example.musicapp.models.Song
+import com.google.firebase.auth.FirebaseAuth
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 
-class LibraryFragment() : Fragment(R.layout.fragment_library) {
+class LibraryFragment : Fragment(R.layout.fragment_library) {
+    lateinit var auth : FirebaseAuth
+
     private lateinit var rcvPlaylist: RecyclerView
     private lateinit var rcvArtist: RecyclerView
     private lateinit var rcvSong: RecyclerView
@@ -40,6 +43,10 @@ class LibraryFragment() : Fragment(R.layout.fragment_library) {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_library, container, false)
 
+        auth = FirebaseAuth.getInstance()
+        val fUser = auth.currentUser
+        val email = fUser?.email.toString()
+
         rcvPlaylist = view.findViewById(R.id.rcvPlaylist)
         rcvArtist = view.findViewById(R.id.rcvArtist)
         rcvSong = view.findViewById(R.id.rcvHistory)
@@ -52,13 +59,9 @@ class LibraryFragment() : Fragment(R.layout.fragment_library) {
 
         val songs1 = ArrayList<Song>()
 
-        val songs2 = ArrayList<Song>()
-
-        val playlists = ArrayList<Playlist>()
-
         cstFavSong.setOnClickListener{
             try {
-                playlistController.getPlaylistByName("Lovely", onComplete = {
+                playlistController.getPlaylistByName(email, "Lovely", onComplete = {
 
                     mainActivity.loadFragment(PlaylistFragment(it), "body")
                 })
@@ -71,7 +74,7 @@ class LibraryFragment() : Fragment(R.layout.fragment_library) {
             mainActivity.loadFragment(DownloadFragment(), "body")
         }
 
-        playlistController.getAllPlaylist(onComplete = {
+        playlistController.getAllPlaylist(email, onComplete = {
             val playlistAdapter = PlaylistAdapter(view.context, it)
             rcvPlaylist.adapter = playlistAdapter
             rcvPlaylist.layoutManager =

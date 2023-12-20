@@ -1,13 +1,13 @@
 package com.example.musicapp.activities
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.media.MediaPlayer
+import android.Manifest
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import com.example.musicapp.R
@@ -22,9 +22,28 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 class MainActivity : AppCompatActivity() {
     private lateinit var bottomNav: BottomNavigationView
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+                if (isGranted) {
+                    Toast.makeText(this, "Thanks for your access", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Please access permission to use our feature",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+        // Request permission when the activity is created
+        requestPermissionLauncher.launch(Manifest.permission.ACCESS_MEDIA_LOCATION)
+        requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        requestPermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
 
         bottomNav = findViewById(R.id.btNav)
 
@@ -40,6 +59,7 @@ class MainActivity : AppCompatActivity() {
             val song = intent.extras?.getSerializable("song") as? Song
             val songs = intent.extras?.getSerializable("songs") as? ArrayList<Song>
             if(songs != null){
+                Log.e("MyApp", "Song's name")
                 if(song != null){
                     Log.e("MyApp", "Song's name: ${song.name}")
                     loadFragment(SongFragment(song, songs), "body")

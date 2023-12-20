@@ -1,6 +1,9 @@
 package com.example.musicapp.fragments
 
+import android.content.Context
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,11 +13,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.PlaylistAdapter
-import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Playlist
 import com.example.musicapp.models.Song
+import java.io.File
 
-class DownloadFragment(): Fragment() {
+class DownloadFragment: Fragment() {
     private lateinit var rcvPlaylist: RecyclerView
     private lateinit var rcvSong: RecyclerView
     override fun onCreateView(
@@ -26,9 +29,7 @@ class DownloadFragment(): Fragment() {
         rcvPlaylist = view.findViewById(R.id.rcvPlaylist)
         rcvSong = view.findViewById(R.id.rcvSong)
 
-        val artists = ArrayList<Artist>()
-
-        val songs1 = ArrayList<Song>()
+        val songs1 = getDownloadedSong()
 
         val playlists = ArrayList<Playlist>()
 
@@ -43,5 +44,41 @@ class DownloadFragment(): Fragment() {
         rcvSong.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
         return view
+    }
+
+    private fun getDownloadedSong(): ArrayList<Song>{
+        val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "/MusicApp")
+
+        val downloadedPlaylist: ArrayList<Song> = ArrayList()
+        val sharedPreferences = requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        if(sharedPreferences != null){
+            if(directory.isDirectory){
+                if(directory.listFiles() != null){
+                    for(file in directory.listFiles()!!){
+                        val song = Song()
+                        val songId = file.name.split(".")[0]
+                        val songString = sharedPreferences.getString("downloaded_song_${songId}", "")
+                        if(songString != ""){
+                            val splitSongString = songString?.split("_")
+                            if (splitSongString != null) {
+                                song.id = splitSongString[0].toLong()
+                                song.name = splitSongString[1]
+                                song.type = splitSongString[2]
+                                song.lyric = splitSongString[3]
+                                song.postAt = splitSongString[4]
+                                song.artist = splitSongString[5]
+                                song.artistName = splitSongString[6]
+                                song.isLoved = splitSongString[7].toBoolean()
+                                song.link = file.path
+                                song.isDownloaded = true
+                                downloadedPlaylist.add(song)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return downloadedPlaylist
     }
 }

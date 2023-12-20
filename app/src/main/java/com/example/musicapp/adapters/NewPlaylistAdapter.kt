@@ -1,5 +1,6 @@
 package com.example.musicapp.adapters
 
+import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -8,29 +9,37 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
-import com.example.musicapp.activities.MainActivity
-import com.example.musicapp.fragments.PlaylistFragment
 import com.example.musicapp.models.Playlist
 
-class PlaylistAdapter(private val context: Context, private val playlists: ArrayList<Playlist>): RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder>() {
+class NewPlaylistAdapter(private val context: Context, private val playlists: ArrayList<Playlist>): RecyclerView.Adapter<NewPlaylistAdapter.NewPlaylistViewHolder>() {
+
+    private var onItemClickListener: OnItemClickListener? = null
+    interface OnItemClickListener{
+        fun onItemClick(position: Int)
+    }
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): PlaylistViewHolder {
+    ): NewPlaylistViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.viewholder_playlist, parent, false)
-        return PlaylistViewHolder(view)
+            .inflate(R.layout.viewholder_new_playlist, parent, false)
+        return NewPlaylistViewHolder(view)
+    }
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        this.onItemClickListener = listener
     }
 
-    override fun onBindViewHolder(holder: PlaylistViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: NewPlaylistViewHolder, position: Int) {
         holder.tvNamePlaylist.text = playlists[position].name
         holder.imgPlaylist.setImageDrawable(context.resources.getDrawable(R.drawable.image_playlist, null))
-        holder.clickItem(context, playlists)
+        holder.itemView.setOnClickListener{
+            onItemClickListener?.onItemClick(position)
+        }
     }
 
     override fun getItemCount() = playlists.size
 
-    class PlaylistViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    class NewPlaylistViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
         var tvNamePlaylist: TextView
         var imgPlaylist: ImageView
 
@@ -38,14 +47,5 @@ class PlaylistAdapter(private val context: Context, private val playlists: Array
             tvNamePlaylist = itemView.findViewById(R.id.tvNamePlaylist)
             imgPlaylist = itemView.findViewById(R.id.imgAvatarPlaylist)
         }
-
-        fun clickItem(context: Context, playlists: ArrayList<Playlist>){
-            itemView.setOnClickListener{
-                val mainActivity = context as MainActivity
-                val playlistFragment = PlaylistFragment(playlists[adapterPosition]);
-                mainActivity.loadFragment(playlistFragment, "body");
-            }
-        }
-
     }
 }

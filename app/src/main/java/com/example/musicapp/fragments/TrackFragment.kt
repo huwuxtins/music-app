@@ -8,7 +8,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.musicapp.R
+import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Song
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 import com.squareup.picasso.Picasso
 
 class TrackFragment(private val song: Song): Fragment(R.layout.fragment_track) {
@@ -26,9 +29,11 @@ class TrackFragment(private val song: Song): Fragment(R.layout.fragment_track) {
         tvNameArtists = view.findViewById(R.id.tvNameArtists)
 
         tvNameSong.text = song.name
-        tvNameArtists.text = "Artist";
+        tvNameArtists.text = song.artistName
 
-        Picasso.get().load(song.image).into(imgSong);
+        if(!song.isDownloaded){
+            Picasso.get().load(song.image).into(imgSong)
+        }
 
         return view
     }

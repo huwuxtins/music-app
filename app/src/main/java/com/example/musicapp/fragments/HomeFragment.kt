@@ -7,9 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
@@ -17,22 +15,21 @@ import com.example.musicapp.activities.MainActivity
 import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.SingerAdapter
 import com.example.musicapp.adapters.TypeAdapter
-import com.example.musicapp.databinding.ActivityMainBinding
 import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Song
 import com.example.musicapp.models.Type
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.toObject
 
-class HomeFragment(): Fragment(R.layout.fragment_home) {
+class HomeFragment: Fragment(R.layout.fragment_home) {
 
-    lateinit var listType : ArrayList<Type>
-    lateinit var recyclerView : RecyclerView
-    lateinit var typeAdpater : TypeAdapter
-    lateinit var recyclerViewSinger : RecyclerView
-    lateinit var singerAdapter: SingerAdapter
-    lateinit var img_account : ImageView
+    private lateinit var listType : ArrayList<Type>
+    private lateinit var recyclerView : RecyclerView
+    private lateinit var typeAdapter : TypeAdapter
+    private lateinit var recyclerViewSinger : RecyclerView
+    private lateinit var singerAdapter: SingerAdapter
+    private lateinit var img_account : ImageView
     private lateinit var listSinger : ArrayList<Artist>
 
     private lateinit var recyclerviewNewSong : RecyclerView
@@ -48,46 +45,40 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-            val view = inflater.inflate(R.layout.fragment_home, container, false)
-            listType = createList()
-            recyclerView =  view.findViewById(R.id.listKind)
-            recyclerViewSinger = view.findViewById(R.id.recyclerView)
-            img_account = view.findViewById(R.id.img_account)
-            db = FirebaseFirestore.getInstance()
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        listType = createList()
+        recyclerView =  view.findViewById(R.id.listKind)
+        recyclerViewSinger = view.findViewById(R.id.recyclerView)
+        img_account = view.findViewById(R.id.img_account)
+        db = FirebaseFirestore.getInstance()
 
-            typeAdpater = activity?.let { TypeAdapter(view.context,listType) }!!
-            recyclerView.adapter = typeAdpater
-            recyclerView!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
+        typeAdapter = activity?.let { TypeAdapter(view.context,listType) }!!
+        recyclerView.adapter = typeAdapter
+        recyclerView!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
 
-            listSinger = ArrayList<Artist>()
-            singerAdapter = activity?.let { SingerAdapter(view.context,listSinger) }!!
-            recyclerViewSinger.adapter = singerAdapter
-            recyclerViewSinger!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
-            listSinger = getListSinger()
+        listSinger = ArrayList<Artist>()
+        singerAdapter = activity?.let { SingerAdapter(view.context,listSinger) }!!
+        recyclerViewSinger.adapter = singerAdapter
+        recyclerViewSinger!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
+        listSinger = getListSinger()
 
-            recyclerviewNewSong = view.findViewById(R.id.listNewSong)
-            listNewSong = ArrayList<Song>()
-            newsongAdapter = activity?.let { NewSongAdapter(view.context, listNewSong, false) }!!
-            recyclerviewNewSong.adapter = newsongAdapter
-            recyclerviewNewSong!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
-            listNewSong = getListNewSong()
+        recyclerviewNewSong = view.findViewById(R.id.listNewSong)
+        listNewSong = ArrayList<Song>()
+        newsongAdapter = activity?.let { NewSongAdapter(view.context, listNewSong, false) }!!
+        recyclerviewNewSong.adapter = newsongAdapter
+        recyclerviewNewSong!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+        listNewSong = getListNewSong()
 
-            txt_singer = view.findViewById(R.id.txt_singer)
+        txt_singer = view.findViewById(R.id.txt_singer)
 
-            txt_singer.setOnClickListener(object : View.OnClickListener {
-                override fun onClick(view: View?) {
-                        goToArtistFragment();
-                }
-            })
+        txt_singer.setOnClickListener { goToArtistFragment(); }
 
-            img_account.setOnClickListener(object : View.OnClickListener {
-                override fun onClick(view: View?) {
-                    val mainActivity = context as MainActivity
-                    mainActivity.loadFragment(InfoFragment(), "body")
-                }
-            })
+        img_account.setOnClickListener {
+            val mainActivity = context as MainActivity
+            mainActivity.loadFragment(InfoFragment(), "body")
+        }
 
-            return view
+        return view
     }
 
     private fun createList() : ArrayList<Type>{
@@ -113,12 +104,11 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
                 singerAdapter.setData(l)
                 singerAdapter.notifyDataSetChanged()
             }
-            .addOnFailureListener { exception ->
+            .addOnFailureListener {
 
             }
         return l
     }
-
 
     private  fun getListNewSong(): ArrayList<Song>{
         val l : ArrayList<Song> = ArrayList<Song>()
@@ -127,12 +117,24 @@ class HomeFragment(): Fragment(R.layout.fragment_home) {
             .addOnSuccessListener { result ->
                 for (document in result) {
                     val s = document.toObject(Song::class.java)
-                    l.add(s)
+
+                    val firestore = FirebaseFirestore.getInstance()
+                    val docRef : DocumentReference = firestore.document(s.artist)
+
+                    docRef.addSnapshotListener { value, error ->
+                        if (value!=null){
+                            val artist = value.toObject(Artist::class.java)
+                            s.artistName = artist?.name.toString()
+                            l.add(s)
+                            newsongAdapter.setData(l)
+                            newsongAdapter.notifyDataSetChanged()
+                        }else{
+                            throw Error(error?.message ?: error.toString())
+                        }
+                    }
                 }
-                newsongAdapter.setData(l)
-                newsongAdapter.notifyDataSetChanged()
             }
-            .addOnFailureListener { exception ->
+            .addOnFailureListener {
             }
 
         return l

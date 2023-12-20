@@ -29,7 +29,10 @@ class LyricsFragment(val song: Song): Fragment(R.layout.fragment_lyrics) {
 
         tvNameSong.text = song.name
         tvLyrics.text = song.lyric
-        Picasso.get().load(song.image).into(imgSong);
+        tvNameArtists.text = song.artistName
+        if(!song.isDownloaded){
+            Picasso.get().load(song.image).into(imgSong)
+        }
         return view
     }
 }
