@@ -71,7 +71,7 @@ class RegisterAccount : AppCompatActivity() {
 //                            database = FirebaseDatabase.getInstance().getReference("Users")
                             db = FirebaseFirestore.getInstance()
                             val linkAvatar = resources.getString(R.string.defaultAvatar);
-                            val user = User(name.toString(),email.toString(),password.toString(),gender.toString(),true,linkAvatar,email.toString(),"Normal");
+                            val user = User(name.toString(),email.toString(),password.toString(),gender.toString(),true,linkAvatar,email.toString(),"Normal",null);
                             val newUser: HashMap<String, Any>  = user.toMap()
                             db.collection("Users").document(user.email).set(newUser)
                                 .addOnSuccessListener { documentReference ->
