@@ -1,19 +1,19 @@
 package com.example.musicapp.adapters
 
 import android.content.Context
-import android.util.Log
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
+import com.example.musicapp.fragments.ArtistInformationFragment
 import com.example.musicapp.models.Artist
-import com.example.musicapp.models.Type
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
+
 
 class SingerAdapter(private val context: Context, private var list: ArrayList<Artist>) :  RecyclerView.Adapter<SingerAdapter.SingerViewHolder>() {
 
@@ -37,7 +37,15 @@ class SingerAdapter(private val context: Context, private var list: ArrayList<Ar
 
 
             holder.itemView.setOnClickListener {
-                Toast.makeText(context,art.name,Toast.LENGTH_SHORT).show()
+                val activity = it!!.context as AppCompatActivity
+                val transaction = activity?.supportFragmentManager?.beginTransaction()
+                val fragment : ArtistInformationFragment =  ArtistInformationFragment()
+                val bundle = Bundle()
+                bundle.putSerializable("artist", art)
+                fragment.arguments = bundle
+                transaction?.replace(R.id.frgMain, fragment)
+                transaction?.addToBackStack("null")
+                transaction?.commit()
             }
     }
 

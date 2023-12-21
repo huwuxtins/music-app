@@ -6,8 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
+import com.example.musicapp.fragments.ArtistInformationFragment
 import com.example.musicapp.models.Artist
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
@@ -40,6 +42,14 @@ class ArtistsSearchAdapter(private val context : Context, private var list : Arr
         holder.name.text = art.name
         val link = art.avatar
         Picasso.get().load(link).into(holder.profile);
+
+        holder.itemView.setOnClickListener {
+            val activity = it!!.context as AppCompatActivity
+            val transaction = activity?.supportFragmentManager?.beginTransaction()
+            transaction?.replace(R.id.frgMain, ArtistInformationFragment())
+            transaction?.addToBackStack("null")
+            transaction?.commit()
+        }
 
     }
 
