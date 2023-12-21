@@ -17,9 +17,7 @@ import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,7 +35,7 @@ import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
 import java.time.LocalDate
 
-class NewSongAdapter(private val context: Context, private var songs: ArrayList<Song>, private val isSongFragment: Boolean?) :  RecyclerView.Adapter<NewSongAdapter.NewSongViewHolder>()  {
+class NewSongAdapter(private val context: Context, private var songs: ArrayList<Song>, private val isSongFragment: Boolean?, private val playlist: Playlist?) :  RecyclerView.Adapter<NewSongAdapter.NewSongViewHolder>()  {
 
     private var playlistController: PlaylistController = PlaylistController()
 
@@ -163,6 +161,10 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
         holder.btnMenu.setOnClickListener{ view ->
             val popupMenu = PopupMenu(context, view)
             popupMenu.inflate(R.menu.menu_song) // Inflate your menu resource
+            if(song.isInPlaylist){
+                val itemAddPlaylist = popupMenu.menu.findItem(R.id.itAddPlaylist)
+                itemAddPlaylist.title = "Remove from this playlist"
+            }
             popupMenu.show()
 
             // Set click listeners for menu items (if needed)
@@ -189,7 +191,7 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
                                     Manifest.permission.ACCESS_MEDIA_LOCATION
                                 ) == PackageManager.PERMISSION_GRANTED -> {
                                     // You can use the API that requires the permission.
-                                    val fileDownloadTask = FileDownloadTask(song.id.toString())
+                                    val fileDownloadTask = FileDownloadTask(song.id.toString(), "")
                                     fileDownloadTask.execute(uri.toString())
                                     Toast.makeText(context, "Downloaded", Toast.LENGTH_SHORT).show()
                                 }
@@ -209,61 +211,73 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
                         true
                     }
                     R.id.itAddPlaylist -> {
-                        val alertDialogBuilder = AlertDialog.Builder(context)
-                        alertDialogBuilder.setTitle("Add new playlist")
-                        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_new_playlist, null)
-                        val rcvPlaylists = dialogView.findViewById<RecyclerView>(R.id.rcv_playlists)
-
-                        alertDialogBuilder.setView(dialogView)
-
-                        alertDialogBuilder.setPositiveButton("OK") { dialog, _ ->
-                            val name = (dialogView.findViewById<EditText>(R.id.idt_name)).text.toString()
-                            // Handle positive button click
-                            val playlist = Playlist(name, email, LocalDate.now().toString(), "")
-                            playlistController.addPlaylist(playlist, onComplete = {
-                                Toast.makeText(context, "Add playlist successfully!", Toast.LENGTH_SHORT).show()
-                                playlistController.updatePlaylist("add", song, name+"_$email", onComplete = {
-                                    Toast.makeText(context, "Adding song to playlist successfully!", Toast.LENGTH_SHORT).show()
-                                }, onFail = {
-                                    Toast.makeText(context, "Adding song to playlist failed!", Toast.LENGTH_SHORT).show()
-                                })
+                        if(song.isInPlaylist){
+                            playlistController.updatePlaylist("remove", song, "${playlist?.name}_$email", onComplete = {
+                                Toast.makeText(context, "Remove ${song.name} from this playlist", Toast.LENGTH_SHORT).show()
+                                playlist?.songs?.remove(song)
+                                notifyDataSetChanged()
                             }, onFail = {
-                                Toast.makeText(context, "Name's playlist was existed", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Can't remove ${song.name} from this playlist", Toast.LENGTH_SHORT).show()
                             })
-                            dialog.dismiss()
                         }
+                        else{
+                            val alertDialogBuilder = AlertDialog.Builder(context)
+                            alertDialogBuilder.setTitle("Add new playlist")
+                            val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_new_playlist, null)
+                            val rcvPlaylists = dialogView.findViewById<RecyclerView>(R.id.rcv_playlists)
 
-                        alertDialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
-                            // Handle negative button click
-                            dialog.dismiss()
-                        }
+                            alertDialogBuilder.setView(dialogView)
 
-                        val alertDialog = alertDialogBuilder.create()
-
-                        playlistController.getAllPlaylist(email, onComplete = { arraylist ->
-                            val playlistAdapter = NewPlaylistAdapter(view.context, arraylist)
-                            rcvPlaylists.adapter = playlistAdapter
-                            rcvPlaylists.layoutManager =
-                                LinearLayoutManager(
-                                    view.context,
-                                    LinearLayoutManager.VERTICAL,
-                                    false
-                                )
-                            playlistAdapter.setOnItemClickListener(object : NewPlaylistAdapter.OnItemClickListener {
-                                override fun onItemClick(position: Int) {
-                                    val chosenPlaylist = arraylist[position]
-                                    Toast.makeText(context, "Choose ${chosenPlaylist.name}", Toast.LENGTH_SHORT).show()
-                                    playlistController.updatePlaylist("add", song, chosenPlaylist.name+"_$email", onComplete = {
+                            alertDialogBuilder.setPositiveButton("OK") { dialog, _ ->
+                                val name = (dialogView.findViewById<EditText>(R.id.idt_name)).text.toString()
+                                // Handle positive button click
+                                val playlist = Playlist(name, email, LocalDate.now().toString(), "")
+                                playlistController.addPlaylist(playlist, onComplete = {
+                                    Toast.makeText(context, "Add playlist successfully!", Toast.LENGTH_SHORT).show()
+                                    playlistController.updatePlaylist("add", song, name+"_$email", onComplete = {
                                         Toast.makeText(context, "Adding song to playlist successfully!", Toast.LENGTH_SHORT).show()
                                     }, onFail = {
                                         Toast.makeText(context, "Adding song to playlist failed!", Toast.LENGTH_SHORT).show()
                                     })
-                                    alertDialog.dismiss()
-                                }
+                                }, onFail = {
+                                    Toast.makeText(context, "Name's playlist was existed", Toast.LENGTH_SHORT).show()
+                                })
+                                dialog.dismiss()
+                            }
+
+                            alertDialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
+                                // Handle negative button click
+                                dialog.dismiss()
+                            }
+
+                            val alertDialog = alertDialogBuilder.create()
+
+                            playlistController.getAllPlaylist(email, onComplete = { arraylist ->
+                                val playlistAdapter = NewPlaylistAdapter(view.context, arraylist)
+                                rcvPlaylists.adapter = playlistAdapter
+                                rcvPlaylists.layoutManager =
+                                    LinearLayoutManager(
+                                        view.context,
+                                        LinearLayoutManager.VERTICAL,
+                                        false
+                                    )
+                                playlistAdapter.setOnItemClickListener(object : NewPlaylistAdapter.OnItemClickListener {
+                                    override fun onItemClick(position: Int) {
+                                        val chosenPlaylist = arraylist[position]
+                                        Toast.makeText(context, "Choose ${chosenPlaylist.name}", Toast.LENGTH_SHORT).show()
+                                        playlistController.updatePlaylist("add", song, chosenPlaylist.name+"_$email", onComplete = {
+                                            Toast.makeText(context, "Adding song to playlist successfully!", Toast.LENGTH_SHORT).show()
+                                        }, onFail = {
+                                            Toast.makeText(context, "Adding song to playlist failed!", Toast.LENGTH_SHORT).show()
+                                        })
+                                        alertDialog.dismiss()
+                                    }
+                                })
                             })
-                        })
-                        // Show the dialog
-                        alertDialog.show()
+                            // Show the dialog
+                            alertDialog.show()
+                        }
+
                         true
                     }
                     else -> false

@@ -11,7 +11,7 @@
             android:layout_gravity="center"
             android:background="@drawable/shape_circular"
             android:scaleType="centerCrop"
-            android:src="@drawable/alan_walker"/>
+            android:src="@drawable/image_song"/>
         <LinearLayout
             android:layout_width="170dp"
             android:layout_height="wrap_content"

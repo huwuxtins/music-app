@@ -29,7 +29,7 @@
                     android:layout_height="50dp"
                     android:background="@drawable/shape_circular"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/alan_walker"/>
+                    android:src="@drawable/image_playlist"/>
             </androidx.cardview.widget.CardView>
 
             <TextView

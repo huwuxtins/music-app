@@ -1,8 +1,6 @@
 package com.example.musicapp.fragments
 
-import android.icu.lang.UCharacter.VerticalOrientation
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,12 +16,7 @@ import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.PlaylistAdapter
 import com.example.musicapp.controllers.PlaylistController
 import com.example.musicapp.models.Artist
-import com.example.musicapp.models.Playlist
-import com.example.musicapp.models.Song
 import com.google.firebase.auth.FirebaseAuth
-import java.time.LocalDate
-import java.time.ZoneId
-import java.util.Date
 
 class LibraryFragment : Fragment(R.layout.fragment_library) {
     lateinit var auth : FirebaseAuth
@@ -57,8 +50,6 @@ class LibraryFragment : Fragment(R.layout.fragment_library) {
 
         val artists = ArrayList<Artist>()
 
-        val songs1 = ArrayList<Song>()
-
         cstFavSong.setOnClickListener{
             try {
                 playlistController.getPlaylistByName(email, "Lovely", onComplete = {
@@ -86,13 +77,14 @@ class LibraryFragment : Fragment(R.layout.fragment_library) {
         rcvArtist.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
 
-        val songAdapter = NewSongAdapter(view.context, songs1, false)
-        rcvSong.adapter = songAdapter
-        rcvSong.hasFixedSize()
-        rcvSong.layoutManager =
-            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+        playlistController.getPlaylistByName(email, "ListenedPlaylist", onComplete = {
+            val songAdapter = NewSongAdapter(view.context, it.songs, false, it)
+            rcvSong.adapter = songAdapter
+            rcvSong.hasFixedSize()
+            rcvSong.layoutManager =
+                LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+        })
+
         return view
     }
-
-
 }
