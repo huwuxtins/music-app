@@ -54,17 +54,17 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
         typeAdapter = activity?.let { TypeAdapter(view.context,listType) }!!
         recyclerView.adapter = typeAdapter
-        recyclerView!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
+        recyclerView.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
 
         listSinger = ArrayList<Artist>()
         singerAdapter = activity?.let { SingerAdapter(view.context,listSinger) }!!
         recyclerViewSinger.adapter = singerAdapter
-        recyclerViewSinger!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
+        recyclerViewSinger.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
         listSinger = getListSinger()
 
         recyclerviewNewSong = view.findViewById(R.id.listNewSong)
         listNewSong = ArrayList<Song>()
-        newsongAdapter = activity?.let { NewSongAdapter(view.context, listNewSong, false) }!!
+        newsongAdapter = activity?.let { NewSongAdapter(view.context, listNewSong, false, null) }!!
         recyclerviewNewSong.adapter = newsongAdapter
         recyclerviewNewSong!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
         listNewSong = getListNewSong()
@@ -84,7 +84,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     private fun createList() : ArrayList<Type>{
         val l : ArrayList<Type> = ArrayList<Type>()
         l.add(Type("Ballad","#0075FF"))
-        l.add(Type("POP","#FF00E5"))
+        l.add(Type("Pop","#FF00E5"))
         l.add(Type("EDM","#35BB52"))
         l.add(Type("K-POP","#E65880"))
         l.add(Type("US-UK","#1FB6BA"))

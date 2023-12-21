@@ -59,7 +59,7 @@ class SearchFragment: Fragment(R.layout.fragment_search) {
         listAlbum = ArrayList()
         listArtist = ArrayList()
 
-        songAdapter = activity?.let { NewSongAdapter(view.context,listSong, false) }!!
+        songAdapter = activity?.let { NewSongAdapter(view.context,listSong, false, null) }!!
         singerAdapter = activity?.let { ArtistsSearchAdapter(view.context,listArtist) }!!
         albumAdapter = activity?.let { AlbumAdapter(view.context,listAlbum) }!!
 
@@ -104,7 +104,7 @@ class SearchFragment: Fragment(R.layout.fragment_search) {
                                 }
                                 songAdapter.setData(listSong)
                                 recyclerView.adapter = songAdapter
-                                recyclerView!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+                                recyclerView.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
                                 songAdapter.notifyDataSetChanged()
                             }else{
                                 throw Error(error?.message ?: error.toString())

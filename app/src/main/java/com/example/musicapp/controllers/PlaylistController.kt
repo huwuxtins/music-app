@@ -18,7 +18,7 @@ class PlaylistController {
 
         db.collection("Playlists")
             .whereEqualTo("userId", userId)
-            .whereNotEqualTo("name", "Lovely")
+            .whereNotEqualTo("name", "ListenedPlaylist")
             .get()
             .addOnSuccessListener { result ->
                 for (document in result) {
@@ -30,6 +30,7 @@ class PlaylistController {
                                 .addOnSuccessListener { songDocument ->
                                     val song  = songDocument.toObject(Song::class.java)
                                     if (song != null) {
+                                        song.isInPlaylist = true
 
                                         val firestore = FirebaseFirestore.getInstance()
                                         val docRef : DocumentReference = firestore.document(song.artist)
@@ -76,6 +77,7 @@ class PlaylistController {
                                         if(nameOfPlaylist == "Lovely"){
                                             song.isLoved = true
                                         }
+                                        song.isInPlaylist = true
 
                                         val firestore = FirebaseFirestore.getInstance()
                                         val docRef : DocumentReference = firestore.document(song.artist)

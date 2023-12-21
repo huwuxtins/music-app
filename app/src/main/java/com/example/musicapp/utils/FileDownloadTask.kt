@@ -8,7 +8,7 @@ import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
-class FileDownloadTask(private val songName: String) : AsyncTask<String, Void, Boolean>() {
+class FileDownloadTask(private val songName: String, private val dirname: String) : AsyncTask<String, Void, Boolean>() {
 
     @Deprecated("Deprecated in Java")
     override fun doInBackground(vararg params: String?): Boolean {
@@ -22,7 +22,7 @@ class FileDownloadTask(private val songName: String) : AsyncTask<String, Void, B
             // Check if the server returned a successful response code (HTTP 200-299)
             if (connection.responseCode == HttpURLConnection.HTTP_OK) {
                 val inputStream = BufferedInputStream(connection.inputStream)
-                val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "/MusicApp")
+                val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "/MusicApp/${dirname}")
                 if (!directory.exists()) {
                     directory.mkdirs()
                 }

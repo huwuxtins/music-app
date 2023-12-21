@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
@@ -29,15 +28,7 @@ class MainActivity : AppCompatActivity() {
 
         val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-                if (isGranted) {
-                    Toast.makeText(this, "Thanks for your access", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(
-                        this,
-                        "Please access permission to use our feature",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                Log.e("MyApp", "Granted: $isGranted")
             }
 
         // Request permission when the activity is created
@@ -55,13 +46,11 @@ class MainActivity : AppCompatActivity() {
         loadFragment(homeFragment, "main")
 
         if(intent.action == "HOME_MUSIC"){
-            Log.e("MyApp", "HOME_MUSIC")
             val song = intent.extras?.getSerializable("song") as? Song
             val songs = intent.extras?.getSerializable("songs") as? ArrayList<Song>
             if(songs != null){
                 Log.e("MyApp", "Song's name")
                 if(song != null){
-                    Log.e("MyApp", "Song's name: ${song.name}")
                     loadFragment(SongFragment(song, songs), "body")
                 }
             }

@@ -16,10 +16,11 @@ class Song  (
     var artistName: String,
     var isLoved: Boolean = false,
     var isDownloaded: Boolean = false,
+    var isInPlaylist: Boolean = false,
     var comments: ArrayList<String>? = null
 ): Serializable{
 
-    constructor() :    this(0, "","", "" , "","", "", "","", false, false, null)
+    constructor():this(0, "","", "" , "","", "", "","", false, false, false, null)
 
     fun getCommentsUser(): ArrayList<DocumentReference>? {
 

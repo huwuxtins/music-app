@@ -66,7 +66,7 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
                 // Handle menu item click here
                 when (it.itemId) {
                     R.id.itPlay -> {
-                        Log.e("MyApp", "Setting play music")
+                        mainActivity.loadFragment(SettingFragment(), "main")
                         true
                     }
 

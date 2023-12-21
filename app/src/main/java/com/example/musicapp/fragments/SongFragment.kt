@@ -27,6 +27,7 @@ import com.example.musicapp.activities.MainActivity
 import com.example.musicapp.adapters.CommentAdapter
 import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.TrackViewPagerAdapter
+import com.example.musicapp.controllers.PlaylistController
 import com.example.musicapp.dialog.LoadingDialog
 import com.example.musicapp.models.Comment
 import com.example.musicapp.models.Song
@@ -54,7 +55,8 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
     private lateinit var btnPre: ImageButton
     private lateinit var btnRandom: ImageButton
     private lateinit var btnLoop: ImageButton
-    private lateinit var img_showCmt : ImageButton
+    private lateinit var btnCmt : ImageButton
+    private lateinit var btnHeart: ImageButton
 //    TextView
     private lateinit var tvStartTime: TextView
     private lateinit var tvEndTime: TextView
@@ -72,6 +74,7 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
     lateinit var auth : FirebaseAuth
 
     private lateinit var commentAdapter : CommentAdapter
+    private val playlistController = PlaylistController()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -92,7 +95,8 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
         tvStartTime = view.findViewById(R.id.tvStartTime)
         tvEndTime = view.findViewById(R.id.tvEndTime)
         btnMenu = view.findViewById(R.id.btnMenuSong)
-        img_showCmt = view.findViewById(R.id.img_showCmt)
+        btnCmt = view.findViewById(R.id.img_showCmt)
+        btnHeart = view.findViewById(R.id.btn_heart)
 
         dialog = LoadingDialog(requireActivity())
         db = FirebaseFirestore.getInstance()
@@ -102,7 +106,7 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
         val popupMenu = PopupMenu(context, btnMenu)
         popupMenu.inflate(R.menu.menu_song2)
 
-        img_showCmt.setOnClickListener {
+        btnCmt.setOnClickListener {
             showComment()
         }
 
@@ -194,8 +198,20 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
 
         btnRandom.setOnClickListener{
             songs = ArrayList(songs.shuffled())
-            rcvSong.adapter = context?.let { NewSongAdapter(it, songs, true) }
+            rcvSong.adapter = context?.let { NewSongAdapter(it, songs, true, null) }
             rcvSong.adapter?.notifyDataSetChanged()
+        }
+
+        val fUser = auth.currentUser
+        val email = fUser?.email.toString()
+
+        btnHeart.setOnClickListener{
+            btnHeart.setImageResource(R.drawable.heart_full)
+            playlistController.updatePlaylist("add", song, "Lovely_$email", onComplete = {
+                Toast.makeText(context, "Adding to favorite playlist", Toast.LENGTH_SHORT).show()
+            }, onFail = {
+                Toast.makeText(context, "Can't add to favorite playlist", Toast.LENGTH_SHORT).show()
+            })
         }
 
         val fragmentList = listOf(DetailSongFragment(song), TrackFragment(song), LyricsFragment(song))
@@ -228,9 +244,14 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
         vpSong.currentItem = 1
 
         registerForContextMenu(rcvSong)
-        rcvSong.adapter = context?.let { NewSongAdapter(it, songs, true) }
+        rcvSong.adapter = context?.let { NewSongAdapter(it, songs, true, null) }
         rcvSong.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
 
+        playlistController.updatePlaylist("add", song, "ListenedPlaylist_$email", onComplete = {
+            Log.e("MyApp", "Add to ListenedPlaylist successfully")
+        }, onFail = {
+            Log.e("MyApp", "Add to ListenedPlaylist failed")
+        })
         return view
     }
 
