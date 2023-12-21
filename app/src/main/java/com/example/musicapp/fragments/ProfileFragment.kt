@@ -2,20 +2,16 @@ package com.example.musicapp.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.musicapp.R
 import com.example.musicapp.activities.Login
 import com.example.musicapp.activities.MainActivity
-import com.example.musicapp.dialog.LoadingDialog
 import com.example.musicapp.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -26,12 +22,11 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
     private lateinit var tvEdit: TextView
     private lateinit var tvLogout: TextView
     private lateinit var btnSetting: ImageButton
-    lateinit var tvLibrary : TextView
-    lateinit var tvMyPage: TextView
-    lateinit var imgAvatar : ImageView
+    private lateinit var tvLibrary : TextView
+    private lateinit var tvMyPage: TextView
+    private lateinit var imgAvatar : ImageView
     private lateinit var auth : FirebaseAuth
     private lateinit var db : FirebaseFirestore
-    private lateinit var dialog : LoadingDialog
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -56,28 +51,8 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
             mainActivity.loadFragment(AccountSettingFragment(), "body")
         }
 
-        btnSetting.setOnClickListener { view ->
-            val popupMenu = PopupMenu(context, view)
-            popupMenu.inflate(R.menu.menu_setting) // Inflate your menu resource
-            popupMenu.show()
-
-            // Set click listeners for menu items (if needed)
-            popupMenu.setOnMenuItemClickListener {
-                // Handle menu item click here
-                when (it.itemId) {
-                    R.id.itPlay -> {
-                        mainActivity.loadFragment(SettingFragment(), "main")
-                        true
-                    }
-
-                    R.id.itContact -> {
-                        Log.e("MyApp", "Setting contact")
-                        true
-                    }
-
-                    else -> false
-                }
-            }
+        btnSetting.setOnClickListener {
+            mainActivity.loadFragment(SettingFragment(), "main")
         }
 
         tvLogout.setOnClickListener {
@@ -100,8 +75,8 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
 
         docRef.get().addOnSuccessListener { dataSnapshot ->
             val user = dataSnapshot.toObject(User::class.java)
-            tvLibrary.setText(user?.username)
-            tvMyPage.setText(user?.email)
+            tvLibrary.text = user?.username
+            tvMyPage.text = user?.email
             Picasso.get().load(user?.avatar).into(imgAvatar)
         }
 

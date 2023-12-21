@@ -7,9 +7,6 @@
     <item android:id="@+id/itShare"
         android:icon="@drawable/icon_download"
         android:title="Share"/>
-    <item android:id="@+id/itAddHeart"
-        android:icon="@drawable/icon_heart"
-        android:title="Add to favourite list"/>
     <item android:id="@+id/itAddPlaylist"
         android:icon="@drawable/icon_playlist"
         android:title="Add to my playlist"/>

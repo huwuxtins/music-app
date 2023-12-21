@@ -43,7 +43,7 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
 
     private var song: Song? = null
     private var songs: ArrayList<Song>? = null
-    val storage = FirebaseStorage.getInstance()
+    private val storage = FirebaseStorage.getInstance()
 
     private val updateSeekBarRunnable: Runnable = object : Runnable {
         override fun run() {
@@ -190,8 +190,14 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                 }
             }
             "MUSIC_LOOP" -> {
-                mMediaPlayer?.isLooping = true
-                Log.e("MyApp", "The end of the song: ${mMediaPlayer?.isLooping}")
+                if(mMediaPlayer?.isLooping == true){
+                    mMediaPlayer?.isLooping = false
+                    Log.e("MyApp", "The end of the song: ${mMediaPlayer?.isLooping}")
+                }
+                else{
+                    mMediaPlayer?.isLooping = true
+                    Log.e("MyApp", "The end of the song: ${mMediaPlayer?.isLooping}")
+                }
             }
 
             "MUSIC_DESTROY" -> {

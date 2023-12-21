@@ -10,4 +10,5 @@
     <color name="subtext">#CCCCCC</color>
     <color name="red">#FF0000</color>
     <color name="selected">#1ED760</color>
+    <color name="selected_btn">#CACACA</color>
 </resources>

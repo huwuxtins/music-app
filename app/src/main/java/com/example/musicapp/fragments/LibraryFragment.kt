@@ -54,11 +54,11 @@ class LibraryFragment : Fragment(R.layout.fragment_library) {
             try {
                 playlistController.getPlaylistByName(email, "Lovely", onComplete = {
 
-                    mainActivity.loadFragment(PlaylistFragment(it), "body")
+                    mainActivity.loadFragment(PlaylistFragment(it), "music")
                 })
             }
             catch (e : Exception){
-                Toast.makeText(context, "Don't have any songs in here", Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Don't have any songs in here", Toast.LENGTH_LONG).show()
             }
         }
         cstDownSong.setOnClickListener{
