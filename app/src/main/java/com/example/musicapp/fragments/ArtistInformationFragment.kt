@@ -66,11 +66,11 @@ class ArtistInformationFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        art = (requireArguments().getSerializable("artist") as Artist?)!!;
+        art = (requireArguments().getSerializable("artist") as Artist?)!!
         listSong = ArrayList()
 
 
-        adapterSong = activity?.let { view?.let { it1 -> NewSongAdapter(it1.context,listSong,false) } }!!
+        adapterSong = activity?.let { view?.let { it1 -> NewSongAdapter(it1.context,listSong,false,null) } }!!
         listSongArtist.adapter = adapterSong
         listSongArtist!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
