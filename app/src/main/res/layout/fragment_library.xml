@@ -177,18 +177,21 @@
             android:textColor="@color/text"
             android:textSize="25sp"
             android:textStyle="bold"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcvPlaylist"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
         <TextView
+            android:id="@+id/artistsFav"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Your favourite artist"
             android:textColor="@color/text"
             android:textSize="25sp"
+            android:drawableRight="@drawable/play2"
             android:textStyle="bold"/>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcvArtist"

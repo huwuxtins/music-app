@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -26,6 +27,7 @@ class LibraryFragment : Fragment(R.layout.fragment_library) {
     private lateinit var rcvSong: RecyclerView
     private lateinit var cstFavSong: ConstraintLayout
     private lateinit var cstDownSong: ConstraintLayout
+    private lateinit var artistsFav : TextView
 
     private val playlistController: PlaylistController = PlaylistController()
 
@@ -45,6 +47,7 @@ class LibraryFragment : Fragment(R.layout.fragment_library) {
         rcvSong = view.findViewById(R.id.rcvHistory)
         cstFavSong = view.findViewById(R.id.cstFavSong)
         cstDownSong = view.findViewById(R.id.cstDownSong)
+        artistsFav = view.findViewById(R.id.artistsFav)
 
         val mainActivity = context as MainActivity
 
@@ -63,6 +66,13 @@ class LibraryFragment : Fragment(R.layout.fragment_library) {
         }
         cstDownSong.setOnClickListener{
             mainActivity.loadFragment(DownloadFragment(), "body")
+        }
+
+        artistsFav.setOnClickListener{
+            val transaction = activity?.supportFragmentManager?.beginTransaction()
+            transaction?.replace(R.id.frgMain, ListMyArtistFragment())
+            transaction?.addToBackStack("null")
+            transaction?.commit()
         }
 
         playlistController.getAllPlaylist(email, onComplete = {
