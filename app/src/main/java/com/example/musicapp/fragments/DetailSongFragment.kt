@@ -18,6 +18,8 @@ class DetailSongFragment(private val song: Song): Fragment(R.layout.fragment_det
     private lateinit var imgSong: ImageView
     private lateinit var tvNameSong: TextView
     private lateinit var tvNameArtists: TextView
+    private lateinit var tvType: TextView
+    private lateinit var tvMusician: TextView
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -27,8 +29,11 @@ class DetailSongFragment(private val song: Song): Fragment(R.layout.fragment_det
         imgSong = view.findViewById(R.id.imgSong)
         tvNameSong = view.findViewById(R.id.tvNameSong)
         tvNameArtists = view.findViewById(R.id.tvNameArtists)
+        tvType = view.findViewById(R.id.tv_type)
+        tvMusician = view.findViewById(R.id.tv_musician)
 
         tvNameSong.text = song.name
+        tvMusician.text = song.artistName
 
         val firestore = FirebaseFirestore.getInstance()
         val docRef : DocumentReference = firestore.document(song.artist)
@@ -41,7 +46,8 @@ class DetailSongFragment(private val song: Song): Fragment(R.layout.fragment_det
                 throw Error(error?.message ?: error.toString())
             }
         }
-//        tvNameArtists = view.
+
+        tvType.text = song.type
 
         if(!song.isDownloaded){
             Picasso.get().load(song.image).into(imgSong)

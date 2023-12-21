@@ -42,8 +42,8 @@ class PlaylistAdapter(private val context: Context, private val playlists: Array
         fun clickItem(context: Context, playlists: ArrayList<Playlist>){
             itemView.setOnClickListener{
                 val mainActivity = context as MainActivity
-                val playlistFragment = PlaylistFragment(playlists[adapterPosition]);
-                mainActivity.loadFragment(playlistFragment, "body");
+                val playlistFragment = PlaylistFragment(playlists[adapterPosition])
+                mainActivity.loadFragment(playlistFragment, "body")
             }
         }
 

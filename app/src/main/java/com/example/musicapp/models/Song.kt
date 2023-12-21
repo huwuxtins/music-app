@@ -31,7 +31,6 @@ class Song  (
                 val docRef = FirebaseFirestore.getInstance().document(path)
                 arr.add(docRef)
             }
-
         }
 
         return arr
