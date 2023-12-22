@@ -2,7 +2,6 @@ package com.example.musicapp.adapters
 
 import android.app.AlertDialog
 import android.content.Context
-import android.provider.MediaStore.Audio.Artists
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,12 +14,10 @@ import com.example.musicapp.models.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 
 class ArtistsFavouriteAdapter(private var context : Context, private var list : ArrayList<DocumentReference> ) : RecyclerView.Adapter<ArtistsFavouriteAdapter.ArtistsFavouriteHolder>(){
-
 
     class ArtistsFavouriteHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
 
@@ -50,11 +47,9 @@ class ArtistsFavouriteAdapter(private var context : Context, private var list : 
         this.list = l
     }
 
-    fun getIndex(s : ArrayList<String>, k : String) : Int{
+    private fun getIndex(s : ArrayList<String>, k : String) : Int{
         return s.indexOf(k)
     }
-
-
 
     override fun onBindViewHolder(holder: ArtistsFavouriteHolder, position: Int) {
         val doc = list[position]
@@ -104,9 +99,7 @@ class ArtistsFavouriteAdapter(private var context : Context, private var list : 
 
                                                 }
                                         }
-
                                     }
-
                                 }
                         }
                         .setNegativeButton("No") { dialog, id ->
@@ -115,10 +108,7 @@ class ArtistsFavouriteAdapter(private var context : Context, private var list : 
                     val alert = builder.create()
                     alert.show()
                 }
-
             }
-
         }
-
     }
 }

@@ -39,7 +39,7 @@ class AlbumController {
                                                 song.artistName = artist?.name.toString()
                                                 album.artistName = artist?.name.toString()
                                                 album.artistImage = artist?.avatar.toString()
-                                                Log.e("MyApp", "Song's name: ${song.name}")
+
                                                 album.songs.add(song)
                                                 albums.add(album)
                                                 onComplete(albums)
@@ -54,9 +54,7 @@ class AlbumController {
                                 }
                         }
                     }
-                    albums.add(album)
                 }
-                onComplete(albums)
             }
             .addOnFailureListener { exception ->
                 Log.e("MyTag", "Can't load all playlist with $exception")

@@ -2,29 +2,22 @@ package com.example.musicapp.fragments
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.example.musicapp.adapters.NewSongAdapter
-import com.example.musicapp.adapters.SingerAdapter
 import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Song
 import com.example.musicapp.models.User
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
-import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 import de.hdodenhof.circleimageview.CircleImageView
 
@@ -72,15 +65,13 @@ class ArtistInformationFragment : Fragment() {
         art = (requireArguments().getSerializable("artist") as Artist?)!!
         listSong = ArrayList()
 
-
         adapterSong = activity?.let { view?.let { it1 -> NewSongAdapter(it1.context,listSong,false,null) } }!!
         listSongArtist.adapter = adapterSong
-        listSongArtist!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+        listSongArtist.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
 
         showData()
 
         setFollow()
-
 
         img_back.setOnClickListener{
             onBackPressed()
@@ -100,8 +91,8 @@ class ArtistInformationFragment : Fragment() {
                         if(task.isSuccessful){
                             val doc = task.result
                             val user = doc.toObject(User::class.java)
-                             var l = user?.favouriteArtist
-                             l?.add("Artists/" + id)
+                            val l = user?.favouriteArtist
+                            l?.add("Artists/$id")
                             db.collection("Users").document(email).update("favouriteArtist",l)
                                 .addOnSuccessListener {
                                     btn_follow.text = "Unfollow"
@@ -128,9 +119,9 @@ class ArtistInformationFragment : Fragment() {
                                 if(task.isSuccessful){
                                     val doc = task.result
                                     val user = doc.toObject(User::class.java)
-                                    var l = user?.favouriteArtist
+                                    val l = user?.favouriteArtist
                                     if(l!=null){
-                                        l?.removeAt(getIndex(l, "Artists/" + idd))
+                                        l?.removeAt(getIndex(l, "Artists/$idd"))
                                         db.collection("Users").document(email).update("favouriteArtist",l)
                                             .addOnSuccessListener {
                                                 btn_follow.text = "Follow"
@@ -141,9 +132,7 @@ class ArtistInformationFragment : Fragment() {
 
                                             }
                                     }
-
                                 }
-
                             }
                     }
                     .setNegativeButton("No") { dialog, id ->
@@ -159,16 +148,16 @@ class ArtistInformationFragment : Fragment() {
         return view
     }
 
-    fun getIndex(s : ArrayList<String>, k : String) : Int{
+    private fun getIndex(s : ArrayList<String>, k : String) : Int{
         return s.indexOf(k)
     }
 
-    fun updateFollow(id: Int, key: String, old : Int){
+    private fun updateFollow(id: Int, key: String, old : Int){
             if(key == "add"){
                 db.collection("Artists").document(id.toString())
                     .update("followers",old+1)
                     .addOnSuccessListener {
-                        var new : Int = old + 1
+                        val new : Int = old + 1
                         art.followers = old + 1
                         txt_followers.text = new.toString() + " followers"
 
@@ -190,7 +179,7 @@ class ArtistInformationFragment : Fragment() {
 
 
 
-    fun showData(){
+    private fun showData(){
         Picasso.get().load(art.avatar).into(img_artist)
         txt_nameArtist.text = art.name
         txt_followers.text = art.followers.toString() + " followers"
@@ -221,16 +210,15 @@ class ArtistInformationFragment : Fragment() {
                 adapterSong.setData(listSong)
                 adapterSong.notifyDataSetChanged()
             }
-
     }
 
-    fun onBackPressed() {
+    private fun onBackPressed() {
         if (parentFragmentManager.backStackEntryCount > 0) {
             parentFragmentManager.popBackStack()
         }
     }
 
-    fun setFollow(){
+    private fun setFollow(){
         val idArt = art.id
 
         val fUser = auth.currentUser

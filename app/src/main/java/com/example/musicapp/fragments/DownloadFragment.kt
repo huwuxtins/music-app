@@ -52,7 +52,7 @@ class DownloadFragment: Fragment() {
         val albumAdapter = AlbumAdapter(view.context, albums)
         rcvAlbum.adapter = albumAdapter
         rcvAlbum.layoutManager =
-            LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
+            LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
         return view
     }
 

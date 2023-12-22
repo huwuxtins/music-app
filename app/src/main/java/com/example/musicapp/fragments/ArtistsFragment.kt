@@ -1,6 +1,5 @@
 package com.example.musicapp.fragments
 
-
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,14 +18,13 @@ import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.google.firebase.firestore.FirebaseFirestore
 
-
 class ArtistsFragment : Fragment() {
-    lateinit var searchView : SearchView
-    lateinit var recyclerView: RecyclerView
+    private lateinit var searchView : SearchView
+    private lateinit var recyclerView: RecyclerView
     lateinit var list : ArrayList<Artist>
-    lateinit var artistAdapter: SingerAdapter
+    private lateinit var artistAdapter: SingerAdapter
     lateinit var db : FirebaseFirestore
-    lateinit var back : ImageView
+    private lateinit var back : ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,11 +46,11 @@ class ArtistsFragment : Fragment() {
         recyclerView.adapter = artistAdapter
 
         val layoutManager = FlexboxLayoutManager(requireActivity().applicationContext)
-        layoutManager.flexDirection = FlexDirection.ROW;
-        layoutManager.justifyContent = JustifyContent.FLEX_START;
+        layoutManager.flexDirection = FlexDirection.ROW
+        layoutManager.justifyContent = JustifyContent.FLEX_START
 
 //        recyclerView!!.layoutManager = LinearLayoutManager(requireActivity().applicationContext, LinearLayoutManager.HORIZONTAL, false)
-        recyclerView!!.layoutManager = layoutManager
+        recyclerView.layoutManager = layoutManager
         list = getListSinger()
 
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -76,7 +74,7 @@ class ArtistsFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun getListSinger() : ArrayList<Artist>{  //lay list artist tu database => set vao adapter
-        val l : ArrayList<Artist> = ArrayList<Artist>()
+        val l : ArrayList<Artist> = ArrayList()
         db.collection("Artists")
             .get()
             .addOnSuccessListener { result ->
@@ -87,13 +85,13 @@ class ArtistsFragment : Fragment() {
                 artistAdapter.setData(l)
                 artistAdapter.notifyDataSetChanged()
             }
-            .addOnFailureListener { exception ->
+            .addOnFailureListener {
 
             }
         return l
     }
 
-    fun onBackPressed() {
+    private fun onBackPressed() {
         if (parentFragmentManager.backStackEntryCount > 0) {
             parentFragmentManager.popBackStack()
         }

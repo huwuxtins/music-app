@@ -16,7 +16,6 @@ import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.SingerAdapter
 import com.example.musicapp.adapters.TypeAdapter
 import com.example.musicapp.controllers.AlbumController
-import com.example.musicapp.models.Album
 import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Song
 import com.example.musicapp.models.Type
@@ -86,7 +85,7 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
         albumController.getAllAlbum {
             rcvAlbum.adapter = AlbumAdapter(view.context, it)
-            rcvAlbum.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
+            rcvAlbum.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
         }
 
         return view
