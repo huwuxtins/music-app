@@ -91,17 +91,34 @@ class ArtistInformationFragment : Fragment() {
                         if(task.isSuccessful){
                             val doc = task.result
                             val user = doc.toObject(User::class.java)
-                            val l = user?.favouriteArtist
-                            l?.add("Artists/$id")
-                            db.collection("Users").document(email).update("favouriteArtist",l)
-                                .addOnSuccessListener {
-                                    btn_follow.text = "Unfollow"
-                                    btn_follow.setBackgroundColor(resources.getColor(R.color.selected))
-                                    updateFollow(id,"add",art.followers)
-                                }
-                                .addOnFailureListener{
+                             var l = user?.favouriteArtist
+                            if(l!=null && l.size != 0){
+                                l?.add("Artists/" + id)
+                                db.collection("Users").document(email).update("favouriteArtist",l)
+                                    .addOnSuccessListener {
+                                        btn_follow.text = "Unfollow"
+                                        btn_follow.setBackgroundColor(resources.getColor(R.color.selected))
+                                        updateFollow(id,"add",art.followers)
+                                    }
+                                    .addOnFailureListener{
 
+                                    }
+                            }
+                            else{  //chưa có favouriteArtists
+                                 l = ArrayList<String>()
+                                 l.add("Artists/" + id)
+                                 user?.favouriteArtist = l
+                                if (user != null) {
+                                    db.collection("Users").document(email).set(user)
+                                        .addOnSuccessListener {
+                                            btn_follow.text = "Unfollow"
+                                            btn_follow.setBackgroundColor(resources.getColor(R.color.selected))
+                                            updateFollow(id,"add",art.followers)
+                                        }
+
+                                        .addOnFailureListener {  }
                                 }
+                            }
 
                         }
 
@@ -119,9 +136,9 @@ class ArtistInformationFragment : Fragment() {
                                 if(task.isSuccessful){
                                     val doc = task.result
                                     val user = doc.toObject(User::class.java)
-                                    val l = user?.favouriteArtist
-                                    if(l!=null){
-                                        l?.removeAt(getIndex(l, "Artists/$idd"))
+                                    var l = user?.favouriteArtist
+                                    if(l!=null && l!!.size != 0){
+                                        l?.removeAt(getIndex(l!!, "Artists/" + idd))
                                         db.collection("Users").document(email).update("favouriteArtist",l)
                                             .addOnSuccessListener {
                                                 btn_follow.text = "Follow"
@@ -241,6 +258,7 @@ class ArtistInformationFragment : Fragment() {
                              btn_follow.setBackgroundColor(resources.getColor(R.color.selected))
                         }
                     }
+
 
                 }
 
