@@ -1,6 +1,7 @@
 package com.example.musicapp.adapters
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,20 +9,21 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
+import com.example.musicapp.activities.MainActivity
+import com.example.musicapp.fragments.AlbumFragment
 import com.example.musicapp.models.Album
 import com.example.musicapp.models.Artist
 import com.google.firebase.firestore.DocumentReference
 import com.squareup.picasso.Picasso
-import de.hdodenhof.circleimageview.CircleImageView
 
 class AlbumAdapter (private val context: Context, private var list: ArrayList<Album>) : RecyclerView.Adapter<AlbumAdapter.AlbumViewHolder>() {
 
 
     class AlbumViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        lateinit var imgAlbum : ImageView
-        lateinit var nameAlbum : TextView
-        lateinit var nameArtist : TextView
+        var imgAlbum : ImageView
+        var nameAlbum : TextView
+        var nameArtist : TextView
 
         init {
             imgAlbum = itemView.findViewById(R.id.imgAlbum)
@@ -52,11 +54,21 @@ class AlbumAdapter (private val context: Context, private var list: ArrayList<Al
                 throw Error(error?.message ?: error.toString())
             }
         }
-        Picasso.get().load(album.image).into(holder.imgAlbum);
+        holder.itemView.setOnClickListener{
+            val mainActivity = context as MainActivity
+            mainActivity.loadFragment(AlbumFragment(album), "body")
+        }
+
+        try{
+            Picasso.get().load(album.image).into(holder.imgAlbum)
+        }
+        catch (e: Exception){
+            Log.e("MyApp", "You're offline, error: $e")
+        }
     }
 
 
-    public fun setData( l : ArrayList<Album>){
+    fun setData( l : ArrayList<Album>){
         this.list = l
     }
 

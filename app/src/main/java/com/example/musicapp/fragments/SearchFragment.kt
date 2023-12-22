@@ -1,6 +1,7 @@
 package com.example.musicapp.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -133,7 +134,7 @@ class SearchFragment: Fragment(R.layout.fragment_search) {
                     }
                     singerAdapter.setData(listArtist)
                     recyclerView.adapter = singerAdapter
-                    recyclerView!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+                    recyclerView.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
                     singerAdapter.notifyDataSetChanged()
                 }
 
@@ -153,13 +154,44 @@ class SearchFragment: Fragment(R.layout.fragment_search) {
                     for (document in result) {
                         val album = document.toObject(Album::class.java)
                         if(album.name.contains(key)){
-                            listAlbum.add(album)
+                            if(album.listSong?.size!! > 0){
+                                for(songReference in album.listSong!!){
+                                    songReference.get()
+                                        .addOnSuccessListener { songDocument ->
+                                            val song  = songDocument.toObject(Song::class.java)
+                                            if (song != null) {
+                                                song.isInPlaylist = true
+
+                                                val firestore = FirebaseFirestore.getInstance()
+                                                val docRef : DocumentReference = firestore.document(song.artist)
+
+                                                docRef.addSnapshotListener { value, error ->
+                                                    if (value!=null){
+                                                        val artist = value.toObject(Artist::class.java)
+                                                        song.artistName = artist?.name.toString()
+                                                        album.artistName = artist?.name.toString()
+                                                        album.artistImage = artist?.avatar.toString()
+                                                        Log.e("MyApp", "Song's name: ${song.name}")
+                                                        album.songs.add(song)
+                                                        listAlbum.add(album)
+
+                                                        albumAdapter.setData(listAlbum)
+                                                        recyclerView.adapter = albumAdapter
+                                                        recyclerView.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+                                                        albumAdapter.notifyDataSetChanged()
+                                                    }else{
+                                                        throw Error(error?.message ?: error.toString())
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        .addOnFailureListener { exception ->
+                                            Log.e("MyApp", "Can't load sons of playlist, error: $exception")
+                                        }
+                                }
+                            }
                         }
                     }
-                    albumAdapter.setData(listAlbum)
-                    recyclerView.adapter = albumAdapter
-                    recyclerView!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
-                    albumAdapter.notifyDataSetChanged()
                 }
 
                 .addOnFailureListener{

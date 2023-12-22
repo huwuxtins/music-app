@@ -57,6 +57,21 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/txt_kind"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="25dp"
+                android:drawableRight="@drawable/play2"
+                android:drawablePadding="10dp"
+                android:text="Topics and kinds"
+                android:textColor="@color/white"
+                android:textSize="30dp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/listKind"
@@ -91,7 +106,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/txt_singer" />
+                app:layout_constraintTop_toBottomOf="@+id/txt_singer"/>
 
             <TextView
                 android:id="@+id/txt_music"
@@ -111,33 +126,39 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/listNewSong"
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="68dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/txt_music" />
 
+
             <TextView
-                android:id="@+id/txt_kind"
+                android:id="@+id/txt_album"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="25dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="32dp"
                 android:drawableRight="@drawable/play2"
                 android:drawablePadding="10dp"
-                android:text="Topics and kinds"
+                android:text="Albums"
                 android:textColor="@color/white"
                 android:textSize="30dp"
                 android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="@+id/txt_singer"
+                app:layout_constraintTop_toBottomOf="@+id/listNewSong" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/listAlbum"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="68dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
+                app:layout_constraintTop_toTopOf="@+id/txt_album" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
     </ScrollView>
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

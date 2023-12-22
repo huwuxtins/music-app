@@ -3,7 +3,6 @@ package com.example.musicapp.fragments
 import android.content.Context
 import android.os.Bundle
 import android.os.Environment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
+import com.example.musicapp.adapters.AlbumAdapter
 import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.PlaylistAdapter
+import com.example.musicapp.models.Album
 import com.example.musicapp.models.Playlist
 import com.example.musicapp.models.Song
 import java.io.File
@@ -20,6 +21,7 @@ import java.io.File
 class DownloadFragment: Fragment() {
     private lateinit var rcvPlaylist: RecyclerView
     private lateinit var rcvSong: RecyclerView
+    private lateinit var rcvAlbum: RecyclerView
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -28,21 +30,29 @@ class DownloadFragment: Fragment() {
         val view = inflater.inflate(R.layout.fragment_download, container, false)
         rcvPlaylist = view.findViewById(R.id.rcvPlaylist)
         rcvSong = view.findViewById(R.id.rcvSong)
+        rcvAlbum = view.findViewById(R.id.rcvAlbum)
 
-        val songs1 = getDownloadedSong()
+        val songs = getDownloadedSong()
 
         val playlists = getDownloadedPlaylists()
+
+        val albums = getDownloadedAlbums()
 
         val playlistAdapter = PlaylistAdapter(view.context, playlists)
         rcvPlaylist.adapter = playlistAdapter
         rcvPlaylist.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
 
-        val songAdapter = NewSongAdapter(view.context, songs1, false, null)
+        val songAdapter = NewSongAdapter(view.context, songs, false, null)
         rcvSong.adapter = songAdapter
         rcvSong.hasFixedSize()
         rcvSong.layoutManager =
             LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+
+        val albumAdapter = AlbumAdapter(view.context, albums)
+        rcvAlbum.adapter = albumAdapter
+        rcvAlbum.layoutManager =
+            LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
         return view
     }
 
@@ -85,7 +95,7 @@ class DownloadFragment: Fragment() {
     private fun getDownloadedPlaylists(): ArrayList<Playlist> {
         val musicAppDirectory = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-            "/MusicApp"
+            "/MusicApp/Playlists"
         )
 
         val downloadedPlaylists: ArrayList<Playlist> = ArrayList()
@@ -140,4 +150,61 @@ class DownloadFragment: Fragment() {
         return downloadedPlaylists
     }
 
+    private fun getDownloadedAlbums(): ArrayList<Album> {
+        val musicAppDirectory = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+            "/MusicApp/Albums"
+        )
+
+        val downloadedAlbums: ArrayList<Album> = ArrayList()
+        val sharedPreferences =
+            requireActivity().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+
+        if (sharedPreferences != null) {
+            if (musicAppDirectory.isDirectory) {
+                val albumFolders = musicAppDirectory.listFiles()
+
+                if (albumFolders != null) {
+                    for (albumFolder in albumFolders) {
+                        if (albumFolder.isDirectory) {
+                            val album = Album()
+                            album.name = albumFolder.name
+
+                            val downloadedSongs: ArrayList<Song> = ArrayList()
+                            val songFiles = albumFolder.listFiles()
+
+                            if (songFiles != null) {
+                                for (file in songFiles) {
+                                    val song = Song()
+                                    val songId = file.name.split(".")[0]
+                                    val songString =
+                                        sharedPreferences.getString("downloaded_song_${songId}", "")
+                                    if (songString != "") {
+                                        val splitSongString = songString?.split("_")
+                                        if (splitSongString != null && splitSongString.size >= 8) {
+                                            song.id = splitSongString[0].toLong()
+                                            song.name = splitSongString[1]
+                                            song.type = splitSongString[2]
+                                            song.lyric = splitSongString[3]
+                                            song.postAt = splitSongString[4]
+                                            song.artist = splitSongString[5]
+                                            song.artistName = splitSongString[6]
+                                            song.isLoved = splitSongString[7].toBoolean()
+                                            song.link = file.path
+                                            song.isDownloaded = true
+                                            downloadedSongs.add(song)
+                                        }
+                                    }
+                                }
+                            }
+
+                            album.songs = downloadedSongs
+                            downloadedAlbums.add(album)
+                        }
+                    }
+                }
+            }
+        }
+        return downloadedAlbums
+    }
 }

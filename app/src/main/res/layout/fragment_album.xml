@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="@color/background"
+    android:scrollbars="none">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/background"
+        android:padding="15dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/imgAlbum"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/image_album"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="@drawable/shape_round"/>
+            <ImageButton
+                android:id="@+id/btnMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:backgroundTint="@color/background"
+                android:src="@drawable/icon_menu"/>
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/imgAlbum"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="Album's name"
+                android:textColor="@color/text"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:padding="10dp"/>
+            <TextView
+                android:id="@+id/tvNameArtist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/tvName"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="Artist's name"
+                android:textColor="@color/text"
+                android:textSize="15sp"
+                android:padding="10dp"/>
+
+            <TextView
+                android:id="@+id/tvYear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/tvNameArtist"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="Album: 2023"
+                android:textColor="@color/text"
+                android:textSize="15sp"
+                android:padding="10dp"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/btnDownload"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="start"
+                android:background="@drawable/shape_circular"
+                android:backgroundTint="@color/backgroundButton"
+                android:src="@drawable/icon_download"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/btnRandom"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/shape_circular"
+                android:backgroundTint="@color/backgroundButton"
+                android:src="@drawable/icon_random"
+                app:layout_constraintEnd_toStartOf="@+id/btnPlay"
+                app:layout_constraintStart_toEndOf="@+id/btnDownload"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"/>
+
+            <ImageButton
+                android:id="@+id/btnPlay"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/shape_circular"
+                android:backgroundTint="@color/backgroundButton"
+                android:src="@drawable/icon_play"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.9"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvSong"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/tv_time_post"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phát hành: "/>
+
+            <TextView
+                android:id="@+id/tv_song_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 bài hát"/>
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profile_image"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/image_song"
+                app:civ_border_color="#FF000000"
+                app:civ_border_width="0dp"
+                android:layout_margin="18dp"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:id="@+id/artist_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

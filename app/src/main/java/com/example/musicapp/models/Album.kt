@@ -9,9 +9,12 @@ class Album(
     var postYear: String,
     var image: String,
     var artist: DocumentReference? = null,
-    var listSong: ArrayList<DocumentReference>?
+    var listSong: ArrayList<DocumentReference>?,
+    var songs: ArrayList<Song> = ArrayList(),
+    var artistImage: String,
+    var artistName: String
 )
 {
-    constructor() :    this(0, "", "" , "",null, null )
+    constructor() :    this(0, "", "" , "",null, null , ArrayList(), "", "")
 
 }

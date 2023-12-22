@@ -1,7 +1,6 @@
 package com.example.musicapp.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,9 +11,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.musicapp.R
 import com.example.musicapp.activities.MainActivity
+import com.example.musicapp.adapters.AlbumAdapter
 import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.SingerAdapter
 import com.example.musicapp.adapters.TypeAdapter
+import com.example.musicapp.controllers.AlbumController
+import com.example.musicapp.models.Album
 import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Song
 import com.example.musicapp.models.Type
@@ -28,17 +30,19 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
     private lateinit var recyclerView : RecyclerView
     private lateinit var typeAdapter : TypeAdapter
     private lateinit var recyclerViewSinger : RecyclerView
+    private lateinit var rcvAlbum: RecyclerView
     private lateinit var singerAdapter: SingerAdapter
     private lateinit var img_account : ImageView
     private lateinit var listSinger : ArrayList<Artist>
 
     private lateinit var recyclerviewNewSong : RecyclerView
     private lateinit var listNewSong : ArrayList<Song>
-    private lateinit var newsongAdapter: NewSongAdapter
+    private lateinit var newSongAdapter: NewSongAdapter
 
     private lateinit var txt_singer : TextView
 
     lateinit var db: FirebaseFirestore
+    private val albumController = AlbumController()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,7 +53,9 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         listType = createList()
         recyclerView =  view.findViewById(R.id.listKind)
         recyclerViewSinger = view.findViewById(R.id.recyclerView)
+        rcvAlbum = view.findViewById(R.id.listAlbum)
         img_account = view.findViewById(R.id.img_account)
+
         db = FirebaseFirestore.getInstance()
 
         typeAdapter = activity?.let { TypeAdapter(view.context,listType) }!!
@@ -64,9 +70,9 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
 
         recyclerviewNewSong = view.findViewById(R.id.listNewSong)
         listNewSong = ArrayList<Song>()
-        newsongAdapter = activity?.let { NewSongAdapter(view.context, listNewSong, false, null) }!!
-        recyclerviewNewSong.adapter = newsongAdapter
-        recyclerviewNewSong!!.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
+        newSongAdapter = activity?.let { NewSongAdapter(view.context, listNewSong, false, null) }!!
+        recyclerviewNewSong.adapter = newSongAdapter
+        recyclerviewNewSong.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
         listNewSong = getListNewSong()
 
         txt_singer = view.findViewById(R.id.txt_singer)
@@ -76,6 +82,11 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
         img_account.setOnClickListener {
             val mainActivity = context as MainActivity
             mainActivity.loadFragment(InfoFragment(), "body")
+        }
+
+        albumController.getAllAlbum {
+            rcvAlbum.adapter = AlbumAdapter(view.context, it)
+            rcvAlbum.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.HORIZONTAL, false)
         }
 
         return view
@@ -126,8 +137,8 @@ class HomeFragment: Fragment(R.layout.fragment_home) {
                             val artist = value.toObject(Artist::class.java)
                             s.artistName = artist?.name.toString()
                             l.add(s)
-                            newsongAdapter.setData(l)
-                            newsongAdapter.notifyDataSetChanged()
+                            newSongAdapter.setData(l)
+                            newSongAdapter.notifyDataSetChanged()
                         }else{
                             throw Error(error?.message ?: error.toString())
                         }
