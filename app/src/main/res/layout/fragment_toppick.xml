@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     tools:context=".activities.MainActivity">
 
     <!--AppBarLayout helps the toolbar and other components to react on
@@ -24,6 +25,7 @@
             app:contentScrim="@color/background_clicked"
             app:layout_scrollFlags="scroll|snap|exitUntilCollapsed"
             app:title="@string/app_name"
+            app:expandedTitleTextColor="@color/white"
             app:expandedTitleMarginStart="16dp">
 
             <ImageView

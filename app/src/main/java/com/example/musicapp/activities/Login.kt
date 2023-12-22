@@ -10,7 +10,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.musicapp.R
+import com.example.musicapp.controllers.PlaylistController
 import com.example.musicapp.dialog.LoadingDialog
+import com.example.musicapp.models.Playlist
 import com.example.musicapp.models.User
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
@@ -28,6 +30,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import java.time.LocalDate
 
 
 class Login : AppCompatActivity() {
@@ -37,6 +40,7 @@ class Login : AppCompatActivity() {
     lateinit var googleSignIn : GoogleSignInClient
     lateinit var dialog : LoadingDialog
     lateinit var callbackManager : CallbackManager
+     private val playlistController = PlaylistController()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -148,6 +152,19 @@ class Login : AppCompatActivity() {
                                 val nUser = User(name.toString(),email.toString(),"null","Male",true,image.toString(),uid.toString(),"Google")
                                 db.collection("Users").document(nUser.email).set(nUser)
                                     .addOnSuccessListener { documentReference ->
+                                        val lovelyPlaylist = Playlist("Lovely", email!!, LocalDate.now().toString(), "")
+                                        playlistController.addPlaylist(lovelyPlaylist, onComplete = {
+                                            Log.e("MyApp", "Add Lovely successfully")
+                                        }, onFail = {
+                                            Log.e("MyApp", "Add Lovely failed")
+                                        })
+
+                                        val listenedPlaylist = Playlist("ListenedPlaylist", email, LocalDate.now().toString(), "")
+                                        playlistController.addPlaylist(listenedPlaylist, onComplete = {
+                                            Log.e("MyApp", "Add Listened successfully")
+                                        }, onFail = {
+                                            Log.e("MyApp", "Add Listened failed")
+                                        })
                                         Toast.makeText(this, "Signed in as ${user?.displayName}", Toast.LENGTH_SHORT).show()
                                         dialog.HideDialog()
                                         startActivity(Intent(this, MainActivity::class.java))
@@ -238,6 +255,20 @@ class Login : AppCompatActivity() {
                                             "Log in success with " + user?.displayName,
                                             Toast.LENGTH_SHORT,
                                         ).show()
+
+                                        val lovelyPlaylist = Playlist("Lovely", email!!, LocalDate.now().toString(), "")
+                                        playlistController.addPlaylist(lovelyPlaylist, onComplete = {
+                                            Log.e("MyApp", "Add Lovely successfully")
+                                        }, onFail = {
+                                            Log.e("MyApp", "Add Lovely failed")
+                                        })
+
+                                        val listenedPlaylist = Playlist("ListenedPlaylist", email, LocalDate.now().toString(), "")
+                                        playlistController.addPlaylist(listenedPlaylist, onComplete = {
+                                            Log.e("MyApp", "Add Listened successfully")
+                                        }, onFail = {
+                                            Log.e("MyApp", "Add Listened failed")
+                                        })
 
                                         dialog.HideDialog()
 
