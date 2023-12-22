@@ -20,6 +20,7 @@ import android.widget.PopupMenu
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -34,6 +35,7 @@ import com.example.musicapp.adapters.NewSongAdapter
 import com.example.musicapp.adapters.TrackViewPagerAdapter
 import com.example.musicapp.controllers.PlaylistController
 import com.example.musicapp.dialog.LoadingDialog
+import com.example.musicapp.models.Artist
 import com.example.musicapp.models.Comment
 import com.example.musicapp.models.Playlist
 import com.example.musicapp.models.Song
@@ -236,6 +238,29 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
 
                         true
                     }
+
+                    R.id.itArtist -> {
+
+                        val art = song.artist
+                        val doc : DocumentReference = db.document(art)
+
+                        doc.addSnapshotListener{ value, error ->
+                            if(value != null){
+                                val artist = value.toObject(Artist::class.java)
+                                val activity = getActivity()
+                                val transaction = activity?.supportFragmentManager?.beginTransaction()
+                                val fragment : ArtistInformationFragment =  ArtistInformationFragment()
+                                val bundle = Bundle()
+                                bundle.putSerializable("artist", artist)
+                                fragment.arguments = bundle
+                                transaction?.replace(R.id.frgMain, fragment)
+                                transaction?.addToBackStack("null")
+                                transaction?.commit()
+                            }
+                        }
+                        true
+                    }
+
                     else -> false
                 }
             }

@@ -30,7 +30,12 @@
             android:exported="false" />
         <activity
             android:name=".activities.splash"
-            android:exported="true" />
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".activities.ForgotPassword"
             android:exported="false" />
@@ -70,10 +75,7 @@
             android:name=".activities.MainActivity"
             android:windowSoftInputMode="adjustNothing"
             android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+
         </activity>
         <service
             android:name=".services.PlayMusicService"
