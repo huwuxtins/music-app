@@ -1,6 +1,7 @@
 package com.example.musicapp.adapters
 
 import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,7 +47,11 @@ class ArtistsSearchAdapter(private val context : Context, private var list : Arr
         holder.itemView.setOnClickListener {
             val activity = it!!.context as AppCompatActivity
             val transaction = activity?.supportFragmentManager?.beginTransaction()
-            transaction?.replace(R.id.frgMain, ArtistInformationFragment())
+            val fragment : ArtistInformationFragment =  ArtistInformationFragment()
+            val bundle = Bundle()
+            bundle.putSerializable("artist", art)
+            fragment.arguments = bundle
+            transaction?.replace(R.id.frgMain, fragment)
             transaction?.addToBackStack("null")
             transaction?.commit()
         }

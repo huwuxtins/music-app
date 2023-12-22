@@ -100,7 +100,9 @@ class SearchFragment: Fragment(R.layout.fragment_search) {
                                 val artist = value.toObject(Artist::class.java)
                                 song.artistName = artist?.name.toString()
 
-                                if(song.name.contains(key)){
+                                val keyN = key.toLowerCase()
+                                val nameN = song.name.toLowerCase()
+                                if(nameN.contains(keyN)){
                                     listSong.add(song)
                                 }
                                 songAdapter.setData(listSong)
@@ -128,7 +130,9 @@ class SearchFragment: Fragment(R.layout.fragment_search) {
                 .addOnSuccessListener { result ->
                     for (document in result) {
                         val art = document.toObject(Artist::class.java)
-                        if(art.name.contains(key)){
+                        val artN = art.name.toLowerCase()
+                        val keyN = key.toLowerCase()
+                        if(artN.contains(keyN)){
                             listArtist.add(art)
                         }
                     }
@@ -153,7 +157,9 @@ class SearchFragment: Fragment(R.layout.fragment_search) {
                 .addOnSuccessListener { result ->
                     for (document in result) {
                         val album = document.toObject(Album::class.java)
-                        if(album.name.contains(key)){
+                        val albumN = album.name.toLowerCase()
+                        val keyN = key.toLowerCase()
+                        if(albumN.contains(keyN)){
                             if(album.listSong?.size!! > 0){
                                 for(songReference in album.listSong!!){
                                     songReference.get()
@@ -161,10 +167,8 @@ class SearchFragment: Fragment(R.layout.fragment_search) {
                                             val song  = songDocument.toObject(Song::class.java)
                                             if (song != null) {
                                                 song.isInPlaylist = true
-
                                                 val firestore = FirebaseFirestore.getInstance()
                                                 val docRef : DocumentReference = firestore.document(song.artist)
-
                                                 docRef.addSnapshotListener { value, error ->
                                                     if (value!=null){
                                                         val artist = value.toObject(Artist::class.java)
@@ -173,8 +177,8 @@ class SearchFragment: Fragment(R.layout.fragment_search) {
                                                         album.artistImage = artist?.avatar.toString()
                                                         Log.e("MyApp", "Song's name: ${song.name}")
                                                         album.songs.add(song)
-                                                        listAlbum.add(album)
 
+                                                        listAlbum.add(album)
                                                         albumAdapter.setData(listAlbum)
                                                         recyclerView.adapter = albumAdapter
                                                         recyclerView.layoutManager = LinearLayoutManager(view.context, LinearLayoutManager.VERTICAL, false)
