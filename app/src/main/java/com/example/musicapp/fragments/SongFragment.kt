@@ -417,12 +417,8 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
                         }
                     }
 
-                    val musicIntent = Intent(activity, PlayMusicService::class.java)
-                    musicIntent.putExtra("song", songs[position])
-                    musicIntent.action = "NEW_MUSIC_PLAY"
                     val songFragment = SongFragment(songs[position], songs)
                     mainActivity.loadFragment(songFragment, "music")
-                    mainActivity.startForegroundService(musicIntent)
                 }
             }
         }

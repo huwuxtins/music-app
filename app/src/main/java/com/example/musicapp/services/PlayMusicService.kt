@@ -91,7 +91,7 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                 }
                 "NEXT_MUSIC" ->{
                     if(songs != null){
-                        val positionOfCurrentSong = songs!!.indexOf(song)
+                        val positionOfCurrentSong = songs!!.indexOf(songs!!.find { s -> s.id == song!!.id })
                         var positionOfNextSong = 0
                         if(positionOfCurrentSong < songs!!.size - 1){
                             positionOfNextSong = positionOfCurrentSong + 1
@@ -115,7 +115,7 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                 }
                 "PRE_MUSIC" -> {
                     if(songs != null){
-                        val positionOfCurrentSong = songs!!.indexOf(song)
+                        val positionOfCurrentSong = songs!!.indexOf(songs!!.find { s -> s.id == song!!.id })
                         var positionOfPreSong = 0
                         if(positionOfCurrentSong > 0){
                             positionOfPreSong = positionOfCurrentSong -1
@@ -173,7 +173,6 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                 return START_STICKY
             }
             "MUSIC_PLAY", "NEW_MUSIC_PLAY" -> {
-                Log.e("MyApp", "Media player is playing")
                 mMediaPlayer?.let { mediaPlayer ->
                     if(mediaPlayer.isPlaying){
                         mediaPlayer.release()
@@ -229,7 +228,7 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
             }
             else{
                 if(songs != null){
-                    val positionOfCurrentSong = songs!!.indexOf(song)
+                    val positionOfCurrentSong = songs!!.indexOf(songs!!.find { s -> s.id == song!!.id })
                     var positionOfNextSong = 0
                     if(positionOfCurrentSong < songs!!.size - 1){
                         positionOfNextSong = positionOfCurrentSong + 1
@@ -246,6 +245,9 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                     sharedPreferences.edit().putLong("song_id", song!!.id).apply()
 
                     playMusic(song!!)
+                }
+                else{
+                    Log.e("MyApp", "Songs is null")
                 }
                 getNotification("STATUS_PLAY", null)
                 sendBroadcast(Intent("com.example.CHANGE_MUSIC")
