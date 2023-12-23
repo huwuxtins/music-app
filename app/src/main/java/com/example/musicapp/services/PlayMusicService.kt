@@ -228,6 +228,25 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
                 it.start()
             }
             else{
+                if(songs != null){
+                    val positionOfCurrentSong = songs!!.indexOf(song)
+                    var positionOfNextSong = 0
+                    if(positionOfCurrentSong < songs!!.size - 1){
+                        positionOfNextSong = positionOfCurrentSong + 1
+                    }
+                    song = songs!![positionOfNextSong]
+                    mMediaPlayer?.let { mediaPlayer ->
+                        if(mediaPlayer.isPlaying){
+                            mediaPlayer.release()
+                        }
+                    }
+                    saveLastPlayedPosition(0)
+
+                    val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                    sharedPreferences.edit().putLong("song_id", song!!.id).apply()
+
+                    playMusic(song!!)
+                }
                 getNotification("STATUS_PLAY", null)
                 sendBroadcast(Intent("com.example.CHANGE_MUSIC")
                     .putExtra("status", "next"))
