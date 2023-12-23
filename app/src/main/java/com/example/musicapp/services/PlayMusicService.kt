@@ -168,7 +168,6 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
             }
             "MUSIC_RESUME" -> {
                 mMediaPlayer?.start()
-                Log.e("MyApp", "MUSIC_RESUME")
                 getNotification("STATUS_PLAY", null)
                 return START_STICKY
             }
@@ -225,9 +224,11 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
         mediaPlayer.setOnCompletionListener {
             if(it.isLooping){
                 it.start()
+                Log.e("MyApp", "Songs is: ${songs!!.size}")
             }
             else{
                 if(songs != null){
+                    Log.e("MyApp", "Songs is: ${songs!!.size}")
                     val positionOfCurrentSong = songs!!.indexOf(songs!!.find { s -> s.id == song!!.id })
                     var positionOfNextSong = 0
                     if(positionOfCurrentSong < songs!!.size - 1){

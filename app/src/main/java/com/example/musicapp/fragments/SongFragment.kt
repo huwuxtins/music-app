@@ -270,6 +270,7 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
         val intent = Intent(activity, PlayMusicService::class.java)
         btnPlay.setOnClickListener{
             intent.putExtra("song", song)
+            intent.putExtra("songs", songs)
             intent.action = "MUSIC_RESUME"
             btnPlay.visibility = View.INVISIBLE
             btnPause.visibility = View.VISIBLE
@@ -278,6 +279,8 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
         }
 
         btnPause.setOnClickListener{
+            intent.putExtra("song", song)
+            intent.putExtra("songs", songs)
             intent.action = "MUSIC_PAUSE"
             btnPause.visibility = View.INVISIBLE
             btnPlay.visibility = View.VISIBLE
@@ -287,6 +290,8 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
 
         btnLoop.setOnClickListener{
             intent.action = "MUSIC_LOOP"
+            intent.putExtra("song", song)
+            intent.putExtra("songs", songs)
             activity?.startForegroundService(intent)
             if(btnLoop.backgroundTintList != ContextCompat.getColorStateList(view.context, R.color.selected_btn)){
                 Toast.makeText(context, "Looping...", Toast.LENGTH_SHORT).show()
@@ -306,6 +311,7 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
             if(positionOfCurrentSong < songs.size - 1){
                 positionOfNextSong = positionOfCurrentSong + 1
             }
+            intent.putExtra("songs", songs)
             intent.putExtra("song", songs[positionOfNextSong])
             intent.action = "NEW_MUSIC_PLAY"
             val songFragment = SongFragment(songs[positionOfNextSong], songs)
@@ -319,6 +325,7 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
             if(positionOfCurrentSong > 0){
                 positionOfPreSong = positionOfCurrentSong -1
             }
+            intent.putExtra("songs", songs)
             intent.putExtra("song", songs[positionOfPreSong])
             intent.action = "NEW_MUSIC_PLAY"
             val songFragment = SongFragment(songs[positionOfPreSong], songs)
