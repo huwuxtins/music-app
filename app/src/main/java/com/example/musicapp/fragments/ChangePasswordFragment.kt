@@ -86,25 +86,23 @@ class ChangePasswordFragment(): Fragment() {
                         }
                         else{
                             docRef
-                                .update("password", nPassInput)
+                                .update("password",nPassInput)
                                 .addOnSuccessListener {
-                                    fUser!!.updatePassword(nPassInput)
-                                        .addOnCompleteListener { task ->
-                                            if (task.isSuccessful) {
-
-                                                Toast.makeText(context,"Update password successfully",Toast.LENGTH_SHORT).show()
-                                                dialog.HideDialog()
+                                    if(fUser != null) {
+                                        fUser.updatePassword(nPassInput)
+                                            .addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    Toast.makeText(context,"Update password successfully",Toast.LENGTH_SHORT).show()
+                                                    dialog.HideDialog()
+                                                } else{
+                                                    docRef.update("password",cPassInput)
+                                                    Toast.makeText(context,"Password change failed with Firebase", Toast.LENGTH_SHORT).show()
+                                                    dialog.HideDialog()
+                                                }
                                             }
-                                            else{
-
-
-                                                Toast.makeText(context,"Password change failed", Toast.LENGTH_SHORT).show()
-                                                dialog.HideDialog()
-                                            }
-                                        }
+                                    }
                                 }
                                 .addOnFailureListener {
-
                                     Toast.makeText(context,"Password change failed",Toast.LENGTH_SHORT).show()
                                     dialog.HideDialog()
 

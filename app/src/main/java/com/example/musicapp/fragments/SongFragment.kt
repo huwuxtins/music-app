@@ -208,7 +208,7 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
                                 Manifest.permission.ACCESS_MEDIA_LOCATION
                             ) == PackageManager.PERMISSION_GRANTED -> {
                                 // You can use the API that requires the permission.
-                                val fileDownloadTask = FileDownloadTask(song.id.toString(), "")
+                                val fileDownloadTask = FileDownloadTask(song.name, "")
                                 fileDownloadTask.execute(uri.toString())
                                 Toast.makeText(view.context, "Downloaded", Toast.LENGTH_SHORT).show()
                             }
@@ -340,12 +340,24 @@ class SongFragment(private val song: Song, private var songs: ArrayList<Song>): 
         }
 
         btnHeart.setOnClickListener{
-            btnHeart.setImageResource(R.drawable.heart_full)
-            playlistController.updatePlaylist("add", song, "Lovely_$email", onComplete = {
-                Toast.makeText(context, "Adding to favorite playlist", Toast.LENGTH_SHORT).show()
-            }, onFail = {
-                Toast.makeText(context, "Can't add to favorite playlist", Toast.LENGTH_SHORT).show()
-            })
+            if(!song.isLoved) {
+                btnHeart.setImageResource(R.drawable.heart_full)
+                playlistController.updatePlaylist("add", song, "Lovely_$email", onComplete = {
+                    Toast.makeText(context, "Adding to favorite playlist", Toast.LENGTH_LONG).show()
+                }, onFail = {
+                    Toast.makeText(context, "Can't add to favorite playlist", Toast.LENGTH_LONG).show()
+                })
+                song.isLoved = true
+            }
+            else{
+                btnHeart.setImageResource(R.drawable.heart)
+                playlistController.updatePlaylist("remove", song, "Lovely_$email", onComplete = {
+                    Toast.makeText(context, "Removing from favorite playlist", Toast.LENGTH_LONG).show()
+                }, onFail = {
+                    Toast.makeText(context, "Can't remove from favorite playlist", Toast.LENGTH_LONG).show()
+                })
+                song.isLoved = false
+            }
         }
 
         val fragmentList = listOf(DetailSongFragment(song), TrackFragment(song), LyricsFragment(song))

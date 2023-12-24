@@ -22,6 +22,7 @@ class ArtistsFragment : Fragment() {
     private lateinit var searchView : SearchView
     private lateinit var recyclerView: RecyclerView
     lateinit var list : ArrayList<Artist>
+    lateinit var listTmp : ArrayList<Artist>
     private lateinit var artistAdapter: SingerAdapter
     lateinit var db : FirebaseFirestore
     private lateinit var back : ImageView
@@ -41,6 +42,7 @@ class ArtistsFragment : Fragment() {
         db = FirebaseFirestore.getInstance()
 
         list = ArrayList()
+        listTmp = ArrayList()
 
         artistAdapter = activity?.let { SingerAdapter(it.applicationContext,list) }!!
         recyclerView.adapter = artistAdapter
@@ -56,11 +58,37 @@ class ArtistsFragment : Fragment() {
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
 
             override fun onQueryTextChange(newText: String): Boolean {
+
+                if(newText == ""){
+                    getListSinger()
+                }
+
                 return false
             }
 
             override fun onQueryTextSubmit(query: String): Boolean {
-                Toast.makeText(activity,query, Toast.LENGTH_SHORT).show()
+                val l : ArrayList<Artist> = ArrayList()
+                db.collection("Artists")
+                    .get()
+                    .addOnSuccessListener { result ->
+                        for (document in result) {
+                            val art = document.toObject(Artist::class.java)
+
+                            val artN = art.name.toLowerCase()
+                            val queryN = query.toLowerCase()
+
+                            if(artN.contains(queryN)){
+                                l.add(art)
+                            }
+
+                        }
+                        artistAdapter.setData(l)
+                        artistAdapter.notifyDataSetChanged()
+                    }
+                    .addOnFailureListener {
+
+                    }
+
                 return false
             }
         })

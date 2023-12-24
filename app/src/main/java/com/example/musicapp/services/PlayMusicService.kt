@@ -20,6 +20,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
@@ -160,48 +161,53 @@ class PlayMusicService: Service(), MediaPlayer.OnPreparedListener, MediaPlayer.O
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.createNotificationChannel(channel)
 
-        when(intent?.action) {
-            "MUSIC_PAUSE" -> {
-                mMediaPlayer?.pause()
-                getNotification("STATUS_PAUSE", null)
-                return START_STICKY
-            }
-            "MUSIC_RESUME" -> {
-                mMediaPlayer?.start()
-                getNotification("STATUS_PLAY", null)
-                return START_STICKY
-            }
-            "MUSIC_PLAY", "NEW_MUSIC_PLAY" -> {
-                mMediaPlayer?.let { mediaPlayer ->
-                    if(mediaPlayer.isPlaying){
-                        mediaPlayer.release()
+        try {
+            when(intent?.action) {
+                "MUSIC_PAUSE" -> {
+                    mMediaPlayer?.pause()
+                    getNotification("STATUS_PAUSE", null)
+                    return START_STICKY
+                }
+                "MUSIC_RESUME" -> {
+                    mMediaPlayer?.start()
+                    getNotification("STATUS_PLAY", null)
+                    return START_STICKY
+                }
+                "MUSIC_PLAY", "NEW_MUSIC_PLAY" -> {
+                    mMediaPlayer?.let { mediaPlayer ->
+                        if(mediaPlayer.isPlaying){
+                            mediaPlayer.release()
+                        }
+                    }
+                    if(song != null){
+                        if(intent.action == "NEW_MUSIC_PLAY"){
+                            saveLastPlayedPosition(0)
+                        }
+                        val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+                        sharedPreferences.edit().putLong("song_id", song!!.id).apply()
+
+                        playMusic(song!!)
                     }
                 }
-                if(song != null){
-                    if(intent.action == "NEW_MUSIC_PLAY"){
-                        saveLastPlayedPosition(0)
+                "MUSIC_LOOP" -> {
+                    if(mMediaPlayer?.isLooping == true){
+                        mMediaPlayer?.isLooping = false
+                        Log.e("MyApp", "The end of the song: ${mMediaPlayer?.isLooping}")
                     }
-                    val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-                    sharedPreferences.edit().putLong("song_id", song!!.id).apply()
+                    else{
+                        mMediaPlayer?.isLooping = true
+                        Log.e("MyApp", "The end of the song: ${mMediaPlayer?.isLooping}")
+                    }
+                }
 
-                    playMusic(song!!)
+                "MUSIC_DESTROY" -> {
+                    stopForeground(STOP_FOREGROUND_REMOVE)
+                    stopSelf()
                 }
             }
-            "MUSIC_LOOP" -> {
-                if(mMediaPlayer?.isLooping == true){
-                    mMediaPlayer?.isLooping = false
-                    Log.e("MyApp", "The end of the song: ${mMediaPlayer?.isLooping}")
-                }
-                else{
-                    mMediaPlayer?.isLooping = true
-                    Log.e("MyApp", "The end of the song: ${mMediaPlayer?.isLooping}")
-                }
-            }
+        }catch(exception: Exception){
 
-            "MUSIC_DESTROY" -> {
-                stopForeground(STOP_FOREGROUND_REMOVE)
-                stopSelf()
-            }
+            Toast.makeText(applicationContext,"An error occurred, please try again later",Toast.LENGTH_SHORT).show()
         }
 
         getNotification("STATUS_PLAY") {

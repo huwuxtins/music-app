@@ -147,6 +147,7 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
                 }, onFail = {
                     Toast.makeText(context, "Can't add to favorite playlist", Toast.LENGTH_LONG).show()
                 })
+                song.isLoved = true
             }
             else{
                 holder.btnHeart.setImageResource(R.drawable.icon_heart)
@@ -155,6 +156,7 @@ class NewSongAdapter(private val context: Context, private var songs: ArrayList<
                 }, onFail = {
                     Toast.makeText(context, "Can't remove from favorite playlist", Toast.LENGTH_LONG).show()
                 })
+                song.isLoved = false
             }
         }
 
